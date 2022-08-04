@@ -1,4 +1,6 @@
+import 'dart:async';
 import 'dart:io';
+import 'package:flutter_easyloading/flutter_easyloading.dart';
 import 'package:http/http.dart' as http;
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
@@ -23,7 +25,7 @@ class DashboardScreen extends StatefulWidget {
 
 class _DashboardScreenState extends State<DashboardScreen> {
   final GlobalKey<ScaffoldState> _scaffoldKey = new GlobalKey<ScaffoldState>();
-
+  Timer? _timer;
   final ImagePicker _picker = ImagePicker();
   late PickedFile? _imageFile = null;
 
@@ -33,6 +35,13 @@ class _DashboardScreenState extends State<DashboardScreen> {
 
   @override
   void initState() {
+    EasyLoading.addStatusCallback((status) {
+      print('EasyLoading Status $status');
+      if (status == EasyLoadingStatus.dismiss) {
+        _timer?.cancel();
+      }
+    });
+
     getPrefrences();
 
     getDashboard(context);
@@ -809,7 +818,8 @@ class _DashboardScreenState extends State<DashboardScreen> {
     });
   }
 
-  getDashboard(BuildContext context) async {
+  getDashboard(BuildContextcontext) async {
+    EasyLoading.show(status: 'loading...');
     final prefs = await SharedPreferences.getInstance();
     String token = prefs.getString(PrefrenceConst.acessToken)!;
     try {
@@ -819,15 +829,17 @@ class _DashboardScreenState extends State<DashboardScreen> {
         'Authorization': 'Bearer $token'
       });
       if (response.statusCode == 200) {
+        EasyLoading.dismiss();
         setState(() {
           responce = getDashboardResponceFromJson(response.body);
-          String a = "a";
         });
       } else {
+        EasyLoading.dismiss();
         AlertDialogue().showAlertDialog(
             context, "Alert Dialogue", response.body.toString());
       }
     } catch (e) {
+      EasyLoading.dismiss();
       String error = e.toString();
       AlertDialogue().showAlertDialog(context, "Alert Dialogue", "$error");
     }

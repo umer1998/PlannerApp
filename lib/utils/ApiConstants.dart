@@ -8,6 +8,12 @@ class ApiConstants {
   static String getEvents = 'getEvents';
   static String actionStatusPlan = 'actionStatusPlan';
   static String createEvent = 'createEvent';
+  static String configurations = 'configurations';
+  static String getLeaves = 'getLeaves';
+  static String updateEvent = 'updateEvent';
+
+  static String getReportingTeam = 'getReportingTeam';
+  static String getPendingApproval = 'getPendingApproval';
 
 }
 

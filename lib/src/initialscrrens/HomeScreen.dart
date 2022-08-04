@@ -1,9 +1,11 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:plannerapp/src/apis/ApiService%20.dart';
 import 'package:plannerapp/src/initialscrrens/Drawer.dart';
 import 'package:plannerapp/src/screens/DashboardScreen.dart';
 import 'package:plannerapp/src/screens/PlannedScreen.dart';
 import 'package:plannerapp/utils/Prefrences.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 import '../screens/ApprovalList.dart';
 import '../screens/CreatePlan.dart';
@@ -26,8 +28,11 @@ class _HomeScreenState extends State<HomeScreen> {
   final PageStorageBucket pageStorageBucket = PageStorageBucket();
   Widget currentScreen = DashboardScreen();
 
+
   @override
   void initState() {
+    getPrefrences();
+    ApiService().getConfiguration(context);
     super.initState();
   }
 
@@ -181,10 +186,15 @@ class _HomeScreenState extends State<HomeScreen> {
                   MaterialButton(
                     minWidth: 40,
                     onPressed: (){
-                      setState(() {
-                        currentScreen = ApprovalList();
-                        currentTab = 3;
-                      });
+                      if(designation == "AM"){
+
+                      } else {
+                        setState(() {
+                          currentScreen = ApprovalList();
+                          currentTab = 3;
+                        });
+                      }
+
                     },
                     child: Column(
                       mainAxisAlignment: MainAxisAlignment.center,
@@ -219,5 +229,14 @@ class _HomeScreenState extends State<HomeScreen> {
     );
   }
 
+  void getPrefrences() async {
+    try {
+      SharedPreferences pref = await SharedPreferences.getInstance();
 
+      setState(() {
+
+        designation = pref.getString(PrefrenceConst.userDesignation)!;
+      });
+    } catch (e) {}
+  }
 }

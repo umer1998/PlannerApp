@@ -119,7 +119,7 @@ class _DrawerState extends State<DrawerScreen> {
   void selectDestination(int index) {
     setState(() {
       _selectedDestination = index;
-      if(_selectedDestination == 1){
+      if(_selectedDestination == 4){
         Navigator.push(
           context,
           MaterialPageRoute(builder: (context) => const LeavesScreen()),

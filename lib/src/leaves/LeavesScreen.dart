@@ -1,6 +1,15 @@
+import 'dart:async';
+
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-
+import 'package:flutter_easyloading/flutter_easyloading.dart';
+import 'package:intl/intl.dart';
+import 'package:plannerapp/src/models/Leaves_Response.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+import 'package:http/http.dart' as http;
+import '../../utils/ApiConstants.dart';
+import '../../utils/Prefrences.dart';
+import '../../utils/alertdialogue.dart';
 import '../initialscrrens/HomeScreen.dart';
 
 class LeavesScreen extends StatefulWidget {
@@ -14,13 +23,26 @@ class _LeavesScreenState extends State<LeavesScreen> with SingleTickerProviderSt
 
   late TabController _controller;
   int _selectedIndex = 0;
+  Timer? _timer;
 
+  late Leaves_Response leaves_response ;
+
+  List<Data> pendingList= [];
+  List<Data> approvedList= [];
+  List<Data> rejectedList= [];
 
 
   @override
   void initState() {
     super.initState();
+    EasyLoading.addStatusCallback((status) {
+      print('EasyLoading Status $status');
+      if (status == EasyLoadingStatus.dismiss) {
+        _timer?.cancel();
+      }
+    });
     _controller = TabController(length: 3, vsync: this);
+    getLeavesResponse();
    // /
   }
   @override
@@ -147,7 +169,7 @@ class _LeavesScreenState extends State<LeavesScreen> with SingleTickerProviderSt
                           ),
                           child: ListView.builder(
                             scrollDirection: Axis.vertical,
-                            itemCount: 10,
+                            itemCount: pendingList.length,
                             itemBuilder: (context, index) {
                               return Padding(
                                 padding: const EdgeInsets.fromLTRB(0, 0, 0, 0),
@@ -172,7 +194,7 @@ class _LeavesScreenState extends State<LeavesScreen> with SingleTickerProviderSt
                                                 crossAxisAlignment: CrossAxisAlignment.start,
                                                 children: [
                                                   Text(
-                                                    "Disbursement",
+                                                    "${pendingList[index].event}",
                                                     style: TextStyle(
                                                         fontFamily: "bold",
                                                         fontSize: 22,
@@ -203,7 +225,7 @@ class _LeavesScreenState extends State<LeavesScreen> with SingleTickerProviderSt
                                                     width: 5,
                                                   ),
                                                   Text(
-                                                    "July 30,2022",
+                                                    "${DateFormat.yMMMMd().format(DateTime.parse(pendingList[index].plannedOn!))}",
                                                     style: TextStyle(
                                                         fontFamily: "semibold",
                                                         fontSize: 14,
@@ -247,7 +269,7 @@ class _LeavesScreenState extends State<LeavesScreen> with SingleTickerProviderSt
                           ),
                           child: ListView.builder(
                             scrollDirection: Axis.vertical,
-                            itemCount: 10,
+                            itemCount: approvedList.length,
                             itemBuilder: (context, index) {
                               return Padding(
                                 padding: const EdgeInsets.fromLTRB(0, 0, 0, 0),
@@ -272,7 +294,7 @@ class _LeavesScreenState extends State<LeavesScreen> with SingleTickerProviderSt
                                                 crossAxisAlignment: CrossAxisAlignment.start,
                                                 children: [
                                                   Text(
-                                                    "Disbursement",
+                                                    "${approvedList[index].event}",
                                                     style: TextStyle(
                                                         fontFamily: "bold",
                                                         fontSize: 22,
@@ -303,7 +325,7 @@ class _LeavesScreenState extends State<LeavesScreen> with SingleTickerProviderSt
                                                     width: 5,
                                                   ),
                                                   Text(
-                                                    "July 30,2022",
+                                                    "${DateFormat.yMMMMd().format(DateTime.parse(approvedList[index].plannedOn!))}",
                                                     style: TextStyle(
                                                         fontFamily: "semibold",
                                                         fontSize: 14,
@@ -347,7 +369,7 @@ class _LeavesScreenState extends State<LeavesScreen> with SingleTickerProviderSt
                           ),
                           child: ListView.builder(
                             scrollDirection: Axis.vertical,
-                            itemCount: 10,
+                            itemCount: rejectedList.length,
                             itemBuilder: (context, index) {
                               return Padding(
                                 padding: const EdgeInsets.fromLTRB(0, 0, 0, 0),
@@ -372,7 +394,7 @@ class _LeavesScreenState extends State<LeavesScreen> with SingleTickerProviderSt
                                                 crossAxisAlignment: CrossAxisAlignment.start,
                                                 children: [
                                                   Text(
-                                                    "Disbursement",
+                                                    "${rejectedList[index].event}",
                                                     style: TextStyle(
                                                         fontFamily: "bold",
                                                         fontSize: 22,
@@ -403,7 +425,7 @@ class _LeavesScreenState extends State<LeavesScreen> with SingleTickerProviderSt
                                                     width: 5,
                                                   ),
                                                   Text(
-                                                    "July 30,2022",
+                                                    "${DateFormat.yMMMMd().format(DateTime.parse(rejectedList[index].plannedOn!))}",
                                                     style: TextStyle(
                                                         fontFamily: "semibold",
                                                         fontSize: 14,
@@ -445,4 +467,45 @@ class _LeavesScreenState extends State<LeavesScreen> with SingleTickerProviderSt
       ),
     );
   }
+
+
+  getLeavesResponse() async {
+    EasyLoading.show(status: 'loading...');
+    final prefs = await SharedPreferences.getInstance();
+    String token = prefs.getString(PrefrenceConst.acessToken)!;
+    try {
+      var url = Uri.parse(ApiConstants.baseUrl + ApiConstants.getLeaves);
+      var response = await http.get(url, headers: {
+        "Accept": 'application/json',
+        'Authorization': 'Bearer $token'
+      });
+      if (response.statusCode == 200) {
+        EasyLoading.dismiss();
+
+          leaves_response = getleavesResponceFromJson(response.body);
+        setState(() {
+          for(int i = 0; i< leaves_response.data!.length; i++){
+            if(leaves_response.data![i].eventStatus == "pending"){
+              pendingList.add(leaves_response.data![i]);
+            } else if(leaves_response.data![i].eventStatus == "approved"){
+              approvedList.add(leaves_response.data![i]);
+            } else if(leaves_response.data![i].eventStatus == "rejected"){
+              rejectedList.add(leaves_response.data![i]);
+            }
+          }
+
+        });
+      } else {
+        EasyLoading.dismiss();
+        AlertDialogue().showAlertDialog(
+            context, "Alert Dialogue", response.body.toString());
+      }
+    } catch (e) {
+      EasyLoading.dismiss();
+      String error = e.toString();
+      AlertDialogue().showAlertDialog(context, "Alert Dialogue", "$error");
+    }
+  }
 }
+
+

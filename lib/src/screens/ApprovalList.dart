@@ -1,6 +1,14 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_easyloading/flutter_easyloading.dart';
 import 'package:intl/intl.dart';
+import 'package:plannerapp/src/models/Get_Managers.dart';
+import 'package:plannerapp/src/screens/ApproveRejectList.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+import 'package:http/http.dart' as http;
 
+import '../../utils/ApiConstants.dart';
+import '../../utils/Prefrences.dart';
+import '../../utils/alertdialogue.dart';
 import '../initialscrrens/HomeScreen.dart';
 
 class ApprovalList extends StatefulWidget {
@@ -12,18 +20,12 @@ class ApprovalList extends StatefulWidget {
 
 class _ExecutionListState extends State<ApprovalList> {
 
-  String dropdownvalue = 'Item 1';
-  var items = [
-    'Item 1',
-    'Item 2',
-    'Item 3',
-    'Item 4',
-    'Item 5',
-  ];
+  late Get_Managers get_managers;
   late String  formatteddate;
 
   @override
   void initState() {
+    getReportingTeam(context);
     var now = new DateTime.now();
     var formatter = new DateFormat('yyyy-MM-dd');
     formatteddate = formatter.format(now);
@@ -44,11 +46,7 @@ class _ExecutionListState extends State<ApprovalList> {
 
           child: Column(
             children: [
-              Container(
-                width: MediaQuery.of(context).size.width,
-                height: 20,
-                color: Colors.white,
-              ),
+
 
               Container(
                 color: Colors.white,
@@ -110,8 +108,10 @@ class _ExecutionListState extends State<ApprovalList> {
                   ),
                   child: ListView.builder(
                     scrollDirection: Axis.vertical,
-                    itemCount: 6,
+                    itemCount: get_managers.data!.length!,
                     itemBuilder: (context, index) {
+
+
                       return Container(
                         color: Colors.white.withOpacity(0.6),
                         child: Column(
@@ -126,7 +126,7 @@ class _ExecutionListState extends State<ApprovalList> {
                                     mainAxisAlignment: MainAxisAlignment.start,
                                     crossAxisAlignment: CrossAxisAlignment.start,
                                     children: [
-                                      Text("Muhammad Zubair",textAlign: TextAlign.start, style: TextStyle(
+                                      Text("${get_managers.data![index].fullname}",textAlign: TextAlign.start, style: TextStyle(
                                           fontSize: 19,
                                           fontWeight: FontWeight.w600,
                                           color: Colors.black
@@ -150,7 +150,7 @@ class _ExecutionListState extends State<ApprovalList> {
 
 
                                           Text(
-                                            "Akhuwat Head Office, Lahore",
+                                            "${get_managers.data![index].designation}",
                                             style: TextStyle(
                                                 fontFamily: "regular",
                                                 fontSize: 15,
@@ -163,33 +163,41 @@ class _ExecutionListState extends State<ApprovalList> {
                                     ],
                                   ),
 
-                                  Padding(
-                                    padding: const EdgeInsets.fromLTRB(0, 8, 0, 0),
-                                    child: Align(
-                                      alignment: Alignment.center,
-                                      child: Container(
-                                        width: 90,
-                                        height: 30,
-                                        decoration: BoxDecoration(
+                                  InkWell(
+                                    onTap: (){
+                                      Navigator.push(
+                                        context,
+                                        MaterialPageRoute(builder: (context) =>  ApproveReject(id : get_managers!.data![index].userId! , name: get_managers!.data![index].fullname!,)),
+                                      );
+                                    },
+                                    child: Padding(
+                                      padding: const EdgeInsets.fromLTRB(0, 8, 0, 0),
+                                      child: Align(
+                                        alignment: Alignment.center,
+                                        child: Container(
+                                          width: 90,
+                                          height: 30,
+                                          decoration: BoxDecoration(
 
-                                          border: Border.all(
-                                            color: Color(0x759e9e9e),
-                                            style: BorderStyle.solid,
-                                            width: 1,
+                                            border: Border.all(
+                                              color: Color(0x759e9e9e),
+                                              style: BorderStyle.solid,
+                                              width: 1,
+                                            ),
+
+                                            borderRadius: new BorderRadius.only(
+                                                topLeft: const Radius.circular(20.0),
+                                                bottomLeft: const Radius.circular(20.0),
+                                                topRight: const Radius.circular(20.0),
+                                                bottomRight: const Radius.circular(20.0)),
                                           ),
-
-                                          borderRadius: new BorderRadius.only(
-                                              topLeft: const Radius.circular(20.0),
-                                              bottomLeft: const Radius.circular(20.0),
-                                              topRight: const Radius.circular(20.0),
-                                              bottomRight: const Radius.circular(20.0)),
-                                        ),
-                                        child: Center(
-                                          child: Text("See Plans",style: TextStyle(
-                                              fontSize: 16,
-                                              fontWeight: FontWeight.w400,
-                                              color: Colors.grey
-                                          ),),
+                                          child: Center(
+                                            child: Text("See Plans",style: TextStyle(
+                                                fontSize: 16,
+                                                fontWeight: FontWeight.w400,
+                                                color: Colors.grey
+                                            ),),
+                                          ),
                                         ),
                                       ),
                                     ),
@@ -221,5 +229,31 @@ class _ExecutionListState extends State<ApprovalList> {
     );
   }
 
+  getReportingTeam(BuildContext context) async {
+    EasyLoading.show(status: 'loading...');
+    final prefs = await SharedPreferences.getInstance();
+    String token = prefs.getString(PrefrenceConst.acessToken)!;
+    try {
+      var url = Uri.parse(ApiConstants.baseUrl + ApiConstants.getReportingTeam);
+      var response = await http.get(url, headers: {
+        "Accept": 'application/json',
+        'Authorization': 'Bearer $token'
+      });
+      if (response.statusCode == 200) {
+        EasyLoading.dismiss();
+        setState(() {
+          get_managers = getManagersResponceFromJson(response.body);
+        });
+      } else {
+        EasyLoading.dismiss();
+        AlertDialogue().showAlertDialog(
+            context, "Alert Dialogue", response.body.toString());
+      }
+    } catch (e) {
+      EasyLoading.dismiss();
+      String error = e.toString();
+      AlertDialogue().showAlertDialog(context, "Alert Dialogue", "$error");
+    }
+  }
 
 }

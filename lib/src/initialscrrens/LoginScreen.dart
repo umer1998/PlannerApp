@@ -1,7 +1,9 @@
+import 'dart:async';
 import 'dart:io';
 
 import 'package:device_info_plus/device_info_plus.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_easyloading/flutter_easyloading.dart';
 import 'package:plannerapp/src/models/Login_Responce.dart';
 import 'package:plannerapp/utils/alertdialogue.dart';
 
@@ -28,11 +30,19 @@ class _LoginScreenState extends State<LoginScreen> {
     }
   }
 
+  Timer? _timer;
+
   TextEditingController nameController = TextEditingController();
   TextEditingController passwordController = TextEditingController();
 
   @override
   void initState() {
+    EasyLoading.addStatusCallback((status) {
+      print('EasyLoading Status $status');
+      if (status == EasyLoadingStatus.dismiss) {
+        _timer?.cancel();
+      }
+    });
     String value = _getId().toString();
   }
 
@@ -92,58 +102,80 @@ class _LoginScreenState extends State<LoginScreen> {
                               height: 65,
                               width: MediaQuery.of(context).size.width,
                               decoration: BoxDecoration(
-                                color: Colors.white.withOpacity(0.5),
-                                border: Border.all(color: Colors.white),
-                                borderRadius: new BorderRadius.only(
-                                    topLeft: const Radius.circular(10.0),
-                                    bottomLeft: const Radius.circular(10.0),
-                                    topRight: const Radius.circular(10.0),
-                                    bottomRight: const Radius.circular(10.0)),
-                                boxShadow: [
-                                  BoxShadow(
-                                    offset: Offset(0, 0),
-                                    blurRadius: 2,
-                                    spreadRadius: 2,
-                                    color: Color(0x79cdcdd0),
-                                  ),
-                                ],
+                                color: Colors.transparent
                               ),
-                              child: Padding(
-                                padding: const EdgeInsets.fromLTRB(15, 10, 15, 10),
-                                child: Column(
-                                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  children: [
-                                    Text(
-                                      "Email",
-                                      textAlign: TextAlign.center,
-                                      style: TextStyle(
-                                          fontWeight: FontWeight.w500,
-                                          color: Colors.grey,
-                                          fontSize: 17),
-                                    ),
-                                    Stack(
-                                      children: [
-                                        Icon(Icons.email_outlined , size: 17, color: Colors.black,),
-                                        Padding(
-                                          padding: const EdgeInsets.fromLTRB(23, 1, 0, 0),
-                                          child: TextField(
-                                            controller: nameController,
-                                            decoration: new InputDecoration.collapsed(
-                                              hintText: 'Username',
-                                            ),
-                                            style: TextStyle(
-                                              fontWeight: FontWeight.w500
-                                            ),
-                                          ),
-                                        ),
-                                      ],
-                                    )
+                              child:TextField(
 
-                                  ],
+                                controller: nameController,
+                                decoration: InputDecoration(
+                                  prefixIcon: Icon(Icons.email_outlined),
+                                  fillColor: AppColors.bgGreen,
+                                  focusColor: Colors.grey,
+                                  border: OutlineInputBorder(
+                                    borderRadius: BorderRadius.circular(15.0),
+                                  ),
+                                  labelText: 'Email',
+                                  hintText: 'Enter Email',
                                 ),
                               ),
                             ),
+
+                            // Container(
+                            //   height: 65,
+                            //   width: MediaQuery.of(context).size.width,
+                            //   decoration: BoxDecoration(
+                            //     color: Colors.white.withOpacity(0.5),
+                            //     border: Border.all(color: Colors.white),
+                            //     borderRadius: new BorderRadius.only(
+                            //         topLeft: const Radius.circular(10.0),
+                            //         bottomLeft: const Radius.circular(10.0),
+                            //         topRight: const Radius.circular(10.0),
+                            //         bottomRight: const Radius.circular(10.0)),
+                            //     boxShadow: [
+                            //       BoxShadow(
+                            //         offset: Offset(0, 0),
+                            //         blurRadius: 2,
+                            //         spreadRadius: 2,
+                            //         color: Color(0x79cdcdd0),
+                            //       ),
+                            //     ],
+                            //   ),
+                            //   child: Padding(
+                            //     padding: const EdgeInsets.fromLTRB(15, 10, 15, 10),
+                            //     child: Column(
+                            //       mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            //       crossAxisAlignment: CrossAxisAlignment.start,
+                            //       children: [
+                            //         Text(
+                            //           "Email",
+                            //           textAlign: TextAlign.center,
+                            //           style: TextStyle(
+                            //               fontWeight: FontWeight.w500,
+                            //               color: Colors.grey,
+                            //               fontSize: 17),
+                            //         ),
+                            //         Stack(
+                            //           children: [
+                            //             Icon(Icons.email_outlined , size: 17, color: Colors.black,),
+                            //             Padding(
+                            //               padding: const EdgeInsets.fromLTRB(23, 1, 0, 0),
+                            //               child: TextField(
+                            //                 controller: nameController,
+                            //                 decoration: new InputDecoration.collapsed(
+                            //                   hintText: 'Username',
+                            //                 ),
+                            //                 style: TextStyle(
+                            //                   fontWeight: FontWeight.w500
+                            //                 ),
+                            //               ),
+                            //             ),
+                            //           ],
+                            //         )
+                            //
+                            //       ],
+                            //     ),
+                            //   ),
+                            // ),
 
                             SizedBox(height: 20,),
 
@@ -151,57 +183,79 @@ class _LoginScreenState extends State<LoginScreen> {
                               height: 65,
                               width: MediaQuery.of(context).size.width,
                               decoration: BoxDecoration(
-                                color: Colors.white.withOpacity(0.5),
-                                border: Border.all(color: Colors.white),
-                                borderRadius: new BorderRadius.only(
-                                    topLeft: const Radius.circular(10.0),
-                                    bottomLeft: const Radius.circular(10.0),
-                                    topRight: const Radius.circular(10.0),
-                                    bottomRight: const Radius.circular(10.0)),
-                                boxShadow: [
-                                  BoxShadow(
-                                    offset: Offset(0, 0),
-                                    blurRadius: 2,
-                                    spreadRadius: 2,
-                                    color: Color(0x79cdcdd0),
-                                  ),
-                                ],
+                                  color: Colors.transparent
                               ),
-                              child: Padding(
-                                padding: const EdgeInsets.fromLTRB(15, 10, 15, 10),
-                                child: Column(
-                                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  children: [
-                                    Text(
-                                      "Password",
-                                      textAlign: TextAlign.center,
-                                      style: TextStyle(
-                                          fontWeight: FontWeight.w500,
-                                          color: Colors.grey,
-                                          fontSize: 17),
-                                    ),
-                                    Stack(
-                                      children: [
-                                        Icon(Icons.lock , size: 17, color: Colors.black,),
-                                        Padding(
-                                          padding: const EdgeInsets.fromLTRB(23, 1, 0, 0),
-                                          child: TextField(
-                                            controller: passwordController,
-                                            decoration: new InputDecoration.collapsed(
-                                              hintText: 'password',
-                                            ),
-                                            style: TextStyle(
-                                                fontWeight: FontWeight.w500
-                                            ),
-                                          ),
-                                        ),
-                                      ],
-                                    )
-                                  ],
+                              child:TextField(
+                                controller: passwordController,
+                                obscureText: true,
+                                decoration: InputDecoration(
+                                  prefixIcon: Icon(Icons.lock),
+                                  border: OutlineInputBorder(
+                                    borderRadius: BorderRadius.circular(15.0),
+                                  ),
+                                  fillColor: AppColors.bgGreen,
+                                  focusColor: Colors.grey,
+                                  labelText: 'Password',
+                                  hintText: 'Enter Password',
                                 ),
                               ),
                             ),
+
+                            // Container(
+                            //   height: 65,
+                            //   width: MediaQuery.of(context).size.width,
+                            //   decoration: BoxDecoration(
+                            //     color: Colors.white.withOpacity(0.5),
+                            //     border: Border.all(color: Colors.white),
+                            //     borderRadius: new BorderRadius.only(
+                            //         topLeft: const Radius.circular(10.0),
+                            //         bottomLeft: const Radius.circular(10.0),
+                            //         topRight: const Radius.circular(10.0),
+                            //         bottomRight: const Radius.circular(10.0)),
+                            //     boxShadow: [
+                            //       BoxShadow(
+                            //         offset: Offset(0, 0),
+                            //         blurRadius: 2,
+                            //         spreadRadius: 2,
+                            //         color: Color(0x79cdcdd0),
+                            //       ),
+                            //     ],
+                            //   ),
+                            //   child: Padding(
+                            //     padding: const EdgeInsets.fromLTRB(15, 10, 15, 10),
+                            //     child: Column(
+                            //       mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            //       crossAxisAlignment: CrossAxisAlignment.start,
+                            //       children: [
+                            //         Text(
+                            //           "Password",
+                            //           textAlign: TextAlign.center,
+                            //           style: TextStyle(
+                            //               fontWeight: FontWeight.w500,
+                            //               color: Colors.grey,
+                            //               fontSize: 17),
+                            //         ),
+                            //         Stack(
+                            //           children: [
+                            //             Icon(Icons.lock , size: 17, color: Colors.black,),
+                            //             Padding(
+                            //               padding: const EdgeInsets.fromLTRB(23, 1, 0, 0),
+                            //               child: TextField(
+                            //                 controller: passwordController,
+                            //                 decoration: new InputDecoration.collapsed(
+                            //                   hintText: 'password',
+                            //                 ),
+                            //                 style: TextStyle(
+                            //                     fontWeight: FontWeight.w500
+                            //                 ),
+                            //               ),
+                            //             ),
+                            //           ],
+                            //         )
+                            //       ],
+                            //     ),
+                            //   ),
+                            // ),
                             // Padding(
                             //   padding: const EdgeInsets.all(15.0),
                             //   child: Row(
@@ -227,10 +281,10 @@ class _LoginScreenState extends State<LoginScreen> {
                                   decoration: BoxDecoration(
                                     color: AppColors.greenText,
                                     borderRadius: new BorderRadius.only(
-                                        topLeft: const Radius.circular(25.0),
-                                        bottomLeft: const Radius.circular(25.0),
-                                        topRight: const Radius.circular(25.0),
-                                        bottomRight: const Radius.circular(25.0)),
+                                        topLeft: const Radius.circular(15.0),
+                                        bottomLeft: const Radius.circular(15.0),
+                                        topRight: const Radius.circular(15.0),
+                                        bottomRight: const Radius.circular(15.0)),
 
                                   ),
                                   child: Center(
@@ -252,7 +306,7 @@ class _LoginScreenState extends State<LoginScreen> {
                       ),
                     ),
 
-                    SizedBox(height: 20,),
+                    SizedBox(height: 5,),
                     Center(
                       child: Text(
                         "Forgot Password?",

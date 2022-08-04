@@ -1,4 +1,7 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
+import 'package:flutter_easyloading/flutter_easyloading.dart';
 import 'package:intl/intl.dart';
 import 'package:plannerapp/src/initialscrrens/HomeScreen.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -21,9 +24,16 @@ class _PlannedScreenState extends State<PlannedScreen> {
 
   late String  formatteddate;
   late Execution_List_Responce responce;
+  Timer? _timer;
 
   @override
   void initState() {
+    EasyLoading.addStatusCallback((status) {
+      print('EasyLoading Status $status');
+      if (status == EasyLoadingStatus.dismiss) {
+        _timer?.cancel();
+      }
+    });
     getList(context);
     var now = new DateTime.now();
     var formatter = new DateFormat('yyyy-MM-dd');
@@ -40,11 +50,7 @@ class _PlannedScreenState extends State<PlannedScreen> {
         child: Column(
           children: [
 
-            Container(
-              width: MediaQuery.of(context).size.width,
-              height: 20,
-              color: Colors.white,
-            ),
+
 
             Container(
               color: Colors.white,
@@ -254,6 +260,7 @@ class _PlannedScreenState extends State<PlannedScreen> {
   }
 
   getList(BuildContext context) async {
+    EasyLoading.show(status: 'loading...');
     final prefs = await SharedPreferences.getInstance();
     String token = prefs.getString(PrefrenceConst.acessToken)!;
     try {
@@ -264,15 +271,18 @@ class _PlannedScreenState extends State<PlannedScreen> {
         'Authorization': 'Bearer $token'
       });
       if (response.statusCode == 200) {
+        EasyLoading.dismiss();
         Execution_List_Responce _model = getExeListResponceFromJson(response.body);
         setState(() {
           responce = _model;
         });
 
       } else {
+        EasyLoading.dismiss();
         AlertDialogue().showAlertDialog(context, "Alert Dialogue", response.body.toString());
       }
     } catch (e) {
+      EasyLoading.dismiss();
       String error = e.toString();
       AlertDialogue().showAlertDialog(context, "Alert Dialogue", "$error");
 

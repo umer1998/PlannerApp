@@ -48,64 +48,58 @@ class _ExecutionListState extends State<ExecutionList> {
       body: SafeArea(
         child: Column(
           children: [
-            SizedBox(
-              height: 20,
-            ),
-            Row(
-              crossAxisAlignment: CrossAxisAlignment.center,
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
 
-                Padding(
-                  padding: const EdgeInsets.fromLTRB(15, 0, 0, 0),
-                  child: GestureDetector(
-                    onTap: (){
-                      Navigator.pushReplacement(
-                        context,
-                        MaterialPageRoute(builder: (context) => const HomeScreen()),
-                      );
-                    },
-                    child: Icon(
-                      Icons.arrow_back_ios_outlined,
-                      color: Colors.black,
-                      size: 20.0,
+            Container(
+              color: Colors.white,
+              child: Padding(
+                padding: const EdgeInsets.fromLTRB(15, 20, 15, 25),
+                child: Row(
+                  crossAxisAlignment: CrossAxisAlignment.center,
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+
+                    Padding(
+                      padding: const EdgeInsets.fromLTRB(0, 0, 0, 0),
+                      child: GestureDetector(
+                        onTap: (){
+                          Navigator.pushReplacement(
+                            context,
+                            MaterialPageRoute(builder: (context) => const HomeScreen()),
+                          );
+                        },
+                        child: Icon(
+                          Icons.arrow_back_ios_outlined,
+                          color: Colors.grey,
+                          size: 25.0,
+                        ),
+                      ),
                     ),
-                  ),
-                ),
 
-                Align(
-                  alignment: Alignment.center,
-                  child: Text(
-                    "Execution List",
-                    style: TextStyle(
-                        fontFamily: "semibold",
-                        fontSize: 27,
-                        color: Colors.black),
-                  ),
-                ),
+                    Align(
+                      alignment: Alignment.center,
+                      child: Text(
+                        "Execution List",
+                        style: TextStyle(
+                            fontFamily: "bold",
+                            fontSize: 27,
+                            color: Colors.black),
+                      ),
+                    ),
 
-                Container(
-                  height: 20,
-                  width: 20,
-                )
-              ],
-            ),
-            SizedBox(
-              height: 10,
-            ),
-            Align(
-              alignment: Alignment.center,
-              child: Text(
-                formatteddate,
-                style: TextStyle(
-                    fontFamily: "medium",
-                    fontSize: 22,
-                    color: Colors.black),
+                    Container(
+                      height: 20,
+                      width: 20,
+                    )
+                  ],
+                ),
               ),
             ),
-            SizedBox(
-              height: 20,
+            Container(
+              height: 8,
+              width: MediaQuery.of(context).size.width,
+              color: Color(0x759e9e9e),
             ),
+
             Expanded(
               child: Container(
                 decoration: BoxDecoration(
