@@ -6,10 +6,12 @@ import 'package:intl/intl.dart';
 import 'package:plannerapp/src/initialscrrens/HomeScreen.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:http/http.dart' as http;
+import '../../style/colors.dart';
 import '../../utils/ApiConstants.dart';
 import '../../utils/Prefrences.dart';
 import '../../utils/alertdialogue.dart';
 import '../models/Execution_List_Responce.dart';
+
 
 
 
@@ -25,6 +27,7 @@ class _PlannedScreenState extends State<PlannedScreen> {
   late String  formatteddate;
   late Execution_List_Responce responce;
   Timer? _timer;
+
 
   @override
   void initState() {
@@ -221,7 +224,7 @@ class _PlannedScreenState extends State<PlannedScreen> {
                                                     ),
                                                     fit: BoxFit.fill)),
                                             Text(
-                                              "${responce.data![index].purposeChild}",
+                                              "${responce.data![index].eventPurpose}",
                                               style: TextStyle(
                                                   fontFamily: "regular",
                                                   fontSize: 15,
@@ -288,4 +291,8 @@ class _PlannedScreenState extends State<PlannedScreen> {
 
     }
   }
+
+
+
 }
+

@@ -1,5 +1,6 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:persistent_bottom_nav_bar/persistent-tab-view.dart';
 import 'package:plannerapp/src/apis/ApiService%20.dart';
 import 'package:plannerapp/src/initialscrrens/Drawer.dart';
 import 'package:plannerapp/src/screens/DashboardScreen.dart';
@@ -32,7 +33,7 @@ class _HomeScreenState extends State<HomeScreen> {
   @override
   void initState() {
     getPrefrences();
-    ApiService().getConfiguration(context);
+
     super.initState();
   }
 
@@ -42,10 +43,7 @@ class _HomeScreenState extends State<HomeScreen> {
     return Scaffold(
 
       drawer: DrawerScreen(),
-      body: PageStorage(
-        child: currentScreen,
-        bucket: pageStorageBucket,
-      ),
+      body: currentScreen,
       floatingActionButton: FloatingActionButton(
         child:  Image.asset('assets/img/create.png', ),
         onPressed: (){
@@ -79,10 +77,12 @@ class _HomeScreenState extends State<HomeScreen> {
                   MaterialButton(
                     minWidth: 40,
                     onPressed: (){
-                      setState(() {
-                        currentScreen = DashboardScreen();
-                        currentTab = 0;
-                      });
+
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(builder: (context) => const DashboardScreen()),
+                        );
+
                     },
                     child: Column(
                       mainAxisAlignment: MainAxisAlignment.center,
@@ -93,7 +93,7 @@ class _HomeScreenState extends State<HomeScreen> {
                             height: 22,
                             width: 22,
                             child: Center(
-                              child: Image.asset('assets/img/home.png', )
+                                child: Image.asset('assets/img/home.png', )
                             ),
                           ),
                         ),
@@ -109,10 +109,10 @@ class _HomeScreenState extends State<HomeScreen> {
                   MaterialButton(
                     minWidth: 40,
                     onPressed: (){
-                      setState(() {
-                        currentScreen = PlannedScreen();
-                        currentTab = 1;
-                      });
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(builder: (context) => const PlannedScreen()),
+                      );
                     },
                     child: Column(
                       mainAxisAlignment: MainAxisAlignment.center,
@@ -143,9 +143,9 @@ class _HomeScreenState extends State<HomeScreen> {
               Padding(
                 padding: const EdgeInsets.fromLTRB(10, 20, 0, 0),
                 child: Text("Create Plan",
-                style: TextStyle(
-                  fontWeight: FontWeight.w500
-                ),),
+                  style: TextStyle(
+                      fontWeight: FontWeight.w500
+                  ),),
               ),
               //right tab
               Row(
@@ -154,10 +154,10 @@ class _HomeScreenState extends State<HomeScreen> {
                   MaterialButton(
                     minWidth: 40,
                     onPressed: (){
-                      setState(() {
-                        currentScreen = ExecutionList();
-                        currentTab = 2;
-                      });
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(builder: (context) => const ExecutionList()),
+                      );
                     },
                     child: Column(
                       mainAxisAlignment: MainAxisAlignment.center,
@@ -189,10 +189,10 @@ class _HomeScreenState extends State<HomeScreen> {
                       if(designation == "AM"){
 
                       } else {
-                        setState(() {
-                          currentScreen = ApprovalList();
-                          currentTab = 3;
-                        });
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(builder: (context) => const ApprovalList()),
+                        );
                       }
 
                     },
@@ -239,4 +239,6 @@ class _HomeScreenState extends State<HomeScreen> {
       });
     } catch (e) {}
   }
+
+
 }

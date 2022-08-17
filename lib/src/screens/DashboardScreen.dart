@@ -1,5 +1,7 @@
 import 'dart:async';
+import 'dart:convert';
 import 'dart:io';
+import 'package:connectivity_plus/connectivity_plus.dart';
 import 'package:flutter_easyloading/flutter_easyloading.dart';
 import 'package:http/http.dart' as http;
 import 'package:flutter/foundation.dart';
@@ -8,6 +10,7 @@ import 'package:image_picker/image_picker.dart';
 import 'package:plannerapp/src/apis/ApiService%20.dart';
 import 'package:plannerapp/src/initialscrrens/Drawer.dart';
 import 'package:plannerapp/src/initialscrrens/HomeScreen.dart';
+import 'package:plannerapp/src/models/ChangedPlanRequest.dart';
 import 'package:plannerapp/src/models/Dashboard_Responce.dart';
 import 'package:plannerapp/style/colors.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -15,6 +18,8 @@ import 'package:shared_preferences/shared_preferences.dart';
 import '../../utils/ApiConstants.dart';
 import '../../utils/Prefrences.dart';
 import '../../utils/alertdialogue.dart';
+import '../models/Execution_List_Responce.dart';
+import '../models/FeedBackSubmission.dart';
 
 class DashboardScreen extends StatefulWidget {
   const DashboardScreen({Key? key}) : super(key: key);
@@ -44,6 +49,10 @@ class _DashboardScreenState extends State<DashboardScreen> {
 
     getPrefrences();
 
+    submittFormData();
+
+    submittChangedPlanData();
+    getList(context);
     getDashboard(context);
     super.initState();
   }
@@ -537,12 +546,12 @@ class _DashboardScreenState extends State<DashboardScreen> {
                   child: Container(
                     child: ListView.builder(
                       scrollDirection: Axis.vertical,
-                      itemCount: 7,
+                      itemCount: responce.data!.plans!.length,
                       itemBuilder: (context, index) {
                         Color bg = Colors.amber;
-                        if (index % 2 == 0) {
+                        if (responce.data!.plans![index].event == "Disbursement") {
                           bg = AppColors.bgBlue;
-                        } else if (index % 3 == 0) {
+                        } else if (responce.data!.plans![index].event == "Meeting") {
                           bg = AppColors.bgGreen;
                         } else {
                           bg = AppColors.bgYellow;
@@ -576,7 +585,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
                                 crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
                                   Text(
-                                    "Disbursement",
+                                    "${responce.data!.plans![index].event}",
                                     style: TextStyle(
                                         fontSize: 18,
                                         fontWeight: FontWeight.w500,
@@ -603,7 +612,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
                                             width: 5,
                                           ),
                                           Text(
-                                            "May 30,2022",
+                                            "${responce.data!.plans![index].plannedOn}",
                                             style: TextStyle(
                                                 fontFamily: "semibold",
                                                 fontSize: 14,
@@ -624,7 +633,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
                                                   ),
                                                   fit: BoxFit.fill)),
                                           Text(
-                                            "Akhuwat Head Office, Lahore",
+                                            "${responce.data!.plans![index].eventPurpose}",
                                             style: TextStyle(
                                                 fontFamily: "regular",
                                                 fontSize: 15,
@@ -646,56 +655,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
                 ),
               ),
 
-              // SizedBox(height: 10,),
-              //
-              //
-              // Padding(padding: const EdgeInsets.fromLTRB(15, 0, 15, 0),
-              //   child: Container(
-              //     height: 60,
-              //     width: MediaQuery. of(context). size. width,
-              //     decoration: BoxDecoration(
-              //       color: Colors.amber,
-              //       borderRadius: new BorderRadius.only(
-              //           topLeft: const Radius.circular(10.0),
-              //           bottomLeft: const Radius.circular(10.0),
-              //           topRight: const Radius.circular(10.0),
-              //           bottomRight:
-              //           const Radius.circular(10.0)),
-              //       boxShadow: [
-              //         BoxShadow(
-              //           offset: Offset(0, 0),
-              //           blurRadius: 2,
-              //           spreadRadius: 2,
-              //           color: Color(0x79cdcdd0),
-              //         ),
-              //       ],
-              //     ),
-              //   ),),
-              // SizedBox(height: 10,),
-              //
-              //
-              // Padding(padding: const EdgeInsets.fromLTRB(15, 0, 15, 0),
-              //   child: Container(
-              //     height: 60,
-              //     width: MediaQuery. of(context). size. width,
-              //     decoration: BoxDecoration(
-              //       color: Colors.tealAccent,
-              //       borderRadius: new BorderRadius.only(
-              //           topLeft: const Radius.circular(10.0),
-              //           bottomLeft: const Radius.circular(10.0),
-              //           topRight: const Radius.circular(10.0),
-              //           bottomRight:
-              //           const Radius.circular(10.0)),
-              //       boxShadow: [
-              //         BoxShadow(
-              //           offset: Offset(0, 0),
-              //           blurRadius: 2,
-              //           spreadRadius: 2,
-              //           color: Color(0x79cdcdd0),
-              //         ),
-              //       ],
-              //     ),
-              //   ),),
+
             ],
           ),
         ),
@@ -821,6 +781,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
   getDashboard(BuildContextcontext) async {
     EasyLoading.show(status: 'loading...');
     final prefs = await SharedPreferences.getInstance();
+
     String token = prefs.getString(PrefrenceConst.acessToken)!;
     try {
       var url = Uri.parse(ApiConstants.baseUrl + ApiConstants.dashboard);
@@ -832,6 +793,144 @@ class _DashboardScreenState extends State<DashboardScreen> {
         EasyLoading.dismiss();
         setState(() {
           responce = getDashboardResponceFromJson(response.body);
+        });
+      } else {
+        EasyLoading.dismiss();
+        AlertDialogue().showAlertDialog(
+            context, "Alert Dialogue", response.body.toString());
+      }
+    } catch (e) {
+      EasyLoading.dismiss();
+      String error = e.toString();
+      AlertDialogue().showAlertDialog(context, "Alert Dialogue", "$error");
+    }
+  }
+
+  getList(BuildContext context) async {
+    EasyLoading.show(status: 'loading...');
+    final prefs = await SharedPreferences.getInstance();
+    String token = prefs.getString(PrefrenceConst.acessToken)!;
+    try {
+
+      var url = Uri.parse(ApiConstants.baseUrl + ApiConstants.executedPlans);
+      var response = await http.get(url, headers: {
+        "Accept": 'application/json',
+        'Authorization': 'Bearer $token'
+      });
+      if (response.statusCode == 200) {
+        EasyLoading.dismiss();
+        Execution_List_Responce _model = getExeListResponceFromJson(response.body);
+        setState(() {
+          prefs.setString(PrefrenceConst.executionList, response.body);
+        });
+
+      } else {
+        EasyLoading.dismiss();
+        AlertDialogue().showAlertDialog(context, "Alert Dialogue", response.body.toString());
+      }
+    } catch (e) {
+      EasyLoading.dismiss();
+      String error = e.toString();
+      AlertDialogue().showAlertDialog(context, "Alert Dialogue", "$error");
+
+    }
+  }
+
+  submittFormData() async{
+    final prefs = await SharedPreferences.getInstance();
+    if(prefs.getString(PrefrenceConst.feedback) != ""){
+      FeedBackSubmission submission = feedbackResponceFromJson(prefs.getString(PrefrenceConst.feedback)!);
+      var connectivityResult = await (Connectivity().checkConnectivity());
+      if (connectivityResult == ConnectivityResult.mobile) {
+        submittForm(context, submission.toJson());
+      } else if (connectivityResult == ConnectivityResult.wifi) {
+        submittForm(context, submission.toJson());
+      }
+    } else {
+
+    }
+
+
+  }
+
+  submittForm(BuildContext context, Map body ) async {
+    EasyLoading.show(status: 'loading...');
+    final prefs = await SharedPreferences.getInstance();
+    String token = prefs.getString(PrefrenceConst.acessToken)!;
+
+
+    try {
+      var url = Uri.parse(ApiConstants.baseUrl + ApiConstants.postFeedback);
+      var response = await http.post(url, headers: {
+        "Accept": 'application/json',
+        "Content-Type": "application/json",
+        'Authorization': 'Bearer $token',
+      }, body: jsonEncode(body));
+      if (response.statusCode == 200) {
+        EasyLoading.dismiss();
+        setState(() async {
+          final prefs = await SharedPreferences.getInstance();
+          prefs.setString(PrefrenceConst.feedback, "");
+          Navigator.pushReplacement(
+              context,
+              MaterialPageRoute(builder: (context) => const HomeScreen()));
+          print("Successssss");
+        });
+      } else {
+        EasyLoading.dismiss();
+        AlertDialogue().showAlertDialog(
+            context, "Alert Dialogue", response.body.toString());
+      }
+    } catch (e) {
+      EasyLoading.dismiss();
+      String error = e.toString();
+      AlertDialogue().showAlertDialog(context, "Alert Dialogue", "$error");
+    }
+  }
+
+  submittChangedPlanData() async {
+    final prefs = await SharedPreferences.getInstance();
+    if(prefs.getString(PrefrenceConst.replaceEventPlusFeedback) != ""){
+      ChangedPlanRequest request = changeplanResponceFromJson(prefs.getString(PrefrenceConst.replaceEventPlusFeedback)!);
+      var connectivityResult = await (Connectivity().checkConnectivity());
+      if (connectivityResult == ConnectivityResult.mobile) {
+        submittChangedPlan(context, request.toJson());
+      } else if (connectivityResult == ConnectivityResult.wifi) {
+        submittChangedPlan(context, request.toJson());
+
+
+
+
+      }
+    } else {
+
+    }
+
+  }
+
+
+  submittChangedPlan(BuildContext context, Map body ) async {
+    EasyLoading.show(status: 'loading...');
+    final prefs = await SharedPreferences.getInstance();
+    String token = prefs.getString(PrefrenceConst.acessToken)!;
+
+    print (jsonEncode(body));
+    try {
+      var url = Uri.parse(ApiConstants.baseUrl + ApiConstants.replaceEventPlusFeedback);
+      var response = await http.post(url, headers: {
+        "Accept": 'application/json',
+        "Content-Type": "application/json",
+        'Authorization': 'Bearer $token',
+      }, body: jsonEncode(body));
+      if (response.statusCode == 200) {
+        EasyLoading.dismiss();
+        setState(()  {
+          prefs.setString(PrefrenceConst.replaceEventPlusFeedback, "");
+
+          Navigator.pushReplacement(
+              context,
+              MaterialPageRoute(builder: (context) => const HomeScreen()));
+          print("Successssss");
         });
       } else {
         EasyLoading.dismiss();

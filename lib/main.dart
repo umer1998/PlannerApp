@@ -1,14 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_easyloading/flutter_easyloading.dart';
-import 'package:plannerapp/src/initialscrrens/HomeScreen.dart';
-import 'package:plannerapp/src/leaves/LeavesScreen.dart';
-import 'package:plannerapp/src/screens/ApprovalList.dart';
-import 'package:plannerapp/src/screens/ApproveRejectList.dart';
-import 'package:plannerapp/src/screens/ExecutionList.dart';
-import 'package:plannerapp/src/screens/FromScreen.dart';
+
 import 'package:plannerapp/src/screens/SplashScreen.dart';
 
-import 'package:plannerapp/utils/Prefrences.dart';
+
 
 
 void main()  {

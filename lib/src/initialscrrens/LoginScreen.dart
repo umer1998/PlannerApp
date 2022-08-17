@@ -6,8 +6,10 @@ import 'package:flutter/material.dart';
 import 'package:flutter_easyloading/flutter_easyloading.dart';
 import 'package:plannerapp/src/models/Login_Responce.dart';
 import 'package:plannerapp/utils/alertdialogue.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 import '../../style/colors.dart';
+import '../../utils/Prefrences.dart';
 import '../apis/ApiService .dart';
 
 class LoginScreen extends StatefulWidget {
@@ -44,6 +46,7 @@ class _LoginScreenState extends State<LoginScreen> {
       }
     });
     String value = _getId().toString();
+
   }
 
   @override
@@ -328,6 +331,7 @@ class _LoginScreenState extends State<LoginScreen> {
   }
 
   void performLogin(){
+    setPrefrences();
     if(nameController.text.isEmpty){
       AlertDialogue().showAlertDialog(context, "Login Failed", "Please enter correct email .");
     } else if(passwordController.text.isEmpty){
@@ -337,8 +341,15 @@ class _LoginScreenState extends State<LoginScreen> {
         'email': nameController.text,
         'password': passwordController.text
       };
-      ApiService().getUsers(body, context) ;
+      ApiService().login(body, context) ;
     }
   }
 
+  void setPrefrences() async {
+    final prefs = await SharedPreferences.getInstance();
+    prefs.setString(PrefrenceConst.feedback, "");
+    prefs.setString(PrefrenceConst.replaceEventPlusFeedback, "");
+  }
+
+  
 }

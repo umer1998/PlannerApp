@@ -5,9 +5,6 @@ Execution_List_Responce getExeListResponceFromJson(String str) => Execution_List
 
 String getExeListResponceInToJson(Execution_List_Responce user) => json.encode(user.toJson());
 
-
-
-
 class Execution_List_Responce {
   bool? success;
   List<Data>? data;
@@ -38,33 +35,37 @@ class Execution_List_Responce {
 }
 
 class Data {
+  int? plannerEventId;
   String? event;
   String? eventPurpose;
   String? plan;
-  String? purposeChild;
+  String? description;
   String? plannedOn;
 
   Data(
-      {this.event,
+      {this.plannerEventId,
+        this.event,
         this.eventPurpose,
         this.plan,
-        this.purposeChild,
+        this.description,
         this.plannedOn});
 
   Data.fromJson(Map<String, dynamic> json) {
+    plannerEventId = json['planner_event_id'];
     event = json['event'];
     eventPurpose = json['event_purpose'];
     plan = json['plan'];
-    purposeChild = json['purpose_child'];
+    description = json['description'];
     plannedOn = json['planned_on'];
   }
 
   Map<String, dynamic> toJson() {
     final Map<String, dynamic> data = new Map<String, dynamic>();
+    data['planner_event_id'] = this.plannerEventId;
     data['event'] = this.event;
     data['event_purpose'] = this.eventPurpose;
     data['plan'] = this.plan;
-    data['purpose_child'] = this.purposeChild;
+    data['description'] = this.description;
     data['planned_on'] = this.plannedOn;
     return data;
   }

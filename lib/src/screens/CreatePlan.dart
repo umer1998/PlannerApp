@@ -105,7 +105,7 @@ class _CreatePlanState extends State<CreatePlan> {
                             'status': "3"
                           };
 
-                          ApiService().submitPlan(body, context);
+                          ApiService().submitPlan(body, context, month);
                         },
                         child: Container(
                           decoration: BoxDecoration(
@@ -617,7 +617,7 @@ class _MyDialogueContentState extends State<MyDialogueContent> {
               icon: const Icon(Icons.keyboard_arrow_down),
               // Array list of items
               items: _eventTypes,
-              value: eventTypevalue,
+              // value: eventTypevalue,
               // After selecting the desired option,it will
               // change button value to selected value
               onChanged: (String? newValue) async {
@@ -663,7 +663,7 @@ class _MyDialogueContentState extends State<MyDialogueContent> {
 
             // Down Arrow Icon
             icon: const Icon(Icons.keyboard_arrow_down),
-            value: eventPurposevalue,
+            // value: eventPurposevalue,
             // Array list of items
             items: _eventPurpose,
             // After selecting the desired option,it will
@@ -698,7 +698,7 @@ class _MyDialogueContentState extends State<MyDialogueContent> {
 
                   // Down Arrow Icon
                   icon: const Icon(Icons.keyboard_arrow_down),
-                  value: branchvalue,
+                  // value: branchvalue,
                   // Array list of items
                   items: _meetingPlace,
                   // After selecting the desired option,it will
@@ -729,7 +729,7 @@ class _MyDialogueContentState extends State<MyDialogueContent> {
                   isExpanded: true,
                   // Initial Value
 
-                  value: regionvalue,
+                  // value: regionvalue,
 
                   // Down Arrow Icon
                   icon: const Icon(Icons.keyboard_arrow_down),
@@ -772,7 +772,7 @@ class _MyDialogueContentState extends State<MyDialogueContent> {
                     icon: const Icon(Icons.keyboard_arrow_down),
                     hint: Text("Select Area"),
                     // value: areavalue,
-                    value: areavalue,
+                    // value: areavalue,
                     // Array list of items
                     items: _area,
                     // After selecting the desired option,it will
@@ -812,7 +812,7 @@ class _MyDialogueContentState extends State<MyDialogueContent> {
                   // Initial Value
                   hint: Text("Select Branch"),
                   // value: branchvalue,
-                  value: branchvalue,
+                  // value: branchvalue,
 
                   // Down Arrow Icon
                   icon: const Icon(Icons.keyboard_arrow_down),
@@ -847,7 +847,7 @@ class _MyDialogueContentState extends State<MyDialogueContent> {
                     'purpose_id': eventPurposevalue.toString(),
                     'purpose_child_id': branchvalue.toString(),
                   };
-
+                  print(widget.month);
                   ApiService().createEvent(body, context);
                 }
               },

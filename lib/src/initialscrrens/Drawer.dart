@@ -6,6 +6,9 @@ import 'package:image_picker/image_picker.dart';
 import 'package:plannerapp/src/leaves/LeavesScreen.dart';
 import 'package:plannerapp/src/screens/DashboardScreen.dart';
 import 'package:plannerapp/src/screens/ExecutionList.dart';
+import 'package:plannerapp/src/screens/SplashScreen.dart';
+import 'package:plannerapp/utils/Prefrences.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 
 
@@ -17,13 +20,27 @@ class DrawerScreen extends StatefulWidget {
 }
 
 class _DrawerState extends State<DrawerScreen> {
-  int _selectedDestination = 0;
+
+  late final prefs ;
+
+  @override
+  void initState() {
+
+    super.initState();
+      initialization();
+
+  }
+
+    int _selectedDestination = 0;
   var activeScreen = DashboardScreen();
   final ImagePicker _picker = ImagePicker();
   late PickedFile? _imageFile = null;
 
   @override
   Widget build(BuildContext context) {
+
+
+
     final theme = Theme.of(context);
     final textTheme = theme.textTheme;
 
@@ -35,13 +52,88 @@ class _DrawerState extends State<DrawerScreen> {
               // Important: Remove any padding from the ListView.
               padding: EdgeInsets.zero,
               children: <Widget>[
-                Padding(
-                  padding: const EdgeInsets.all(16.0),
-                  child: Row(
+                Container(
+                  height: 250,
+                  width: MediaQuery.of(context).size.width,
+                  decoration: BoxDecoration(
+
+                    image: DecorationImage(
+                      image: AssetImage(
+                        'asset/img/shape.png',
+                      ),
+                      fit: BoxFit.fill,),
+                  ),
+                  child: Wrap(
                     children: [
-                      imageProfile(),
+                      Padding(
+                        padding: const EdgeInsets.fromLTRB(15, 20, 15, 0),
+                        child: Column(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          crossAxisAlignment: CrossAxisAlignment.center,
+                          children: [
+                            Row(
+                              mainAxisAlignment: MainAxisAlignment.start,
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Icon(
+                                  Icons.arrow_back_ios_outlined,
+                                  size: 20,
+                                  color: Colors.grey,
+                                ),
+                              ],
+                            ),
+                            SizedBox(
+                              height: 15,
+                            ),
+                            Container(
+                              height: 90,
+                              width: 90,
+                              decoration: BoxDecoration(
+                                image: DecorationImage(
+                                    image: AssetImage("asset/img/person.png"),
+                                    fit: BoxFit.fitHeight),
+                                shape: BoxShape.circle,
+                                border: Border.all(
+                                  color: Colors.white,
+                                  // color: Color(0xffFEFEFE),
+                                  width: 3,
+                                ),
+                              ),
+                            ),
+                            SizedBox(
+                              height: 15,
+                            ),
+                            Row(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              crossAxisAlignment: CrossAxisAlignment.center,
+                              children: [
+                                Center(
+                                  child: Text(
+                                    "${prefs.getString(PrefrenceConst.userName)}",
+                                    style: TextStyle(
+                                        fontFamily: "semibold",
+                                        fontSize: 18,
+                                        color: Colors.black),
+                                  ),
+                                ),
+
+                              ],
+                            ),
+                            SizedBox(
+                              height: 3,
+                            ),
+                            Text(
+                                "${prefs.getString(PrefrenceConst.userDesignation)}",
+                              style: TextStyle(
+                                  fontFamily: "regular",
+                                  fontSize: 15,
+                                  color: Colors.grey),
+                            )
+                          ],
+                        ),
+                      ),
                     ],
-                  )
+                  ),
                 ),
                 Divider(
                   height: 1,
@@ -75,7 +167,7 @@ class _DrawerState extends State<DrawerScreen> {
                   onTap: () => selectDestination(2),
                 ),
                 ListTile(
-                  leading: Image.asset('assets/img/executed.png',height: 20, width: 20,  ),
+                  leading: Image.asset('assets/img/approval.png',height: 20, width: 20,  ),
                   title: Text('Approval List', style: TextStyle(
                       fontWeight: FontWeight.w500,
                       fontSize: 18
@@ -117,7 +209,7 @@ class _DrawerState extends State<DrawerScreen> {
   }
 
   void selectDestination(int index) {
-    setState(() {
+    setState(() async {
       _selectedDestination = index;
       if(_selectedDestination == 4){
         Navigator.push(
@@ -125,6 +217,14 @@ class _DrawerState extends State<DrawerScreen> {
           MaterialPageRoute(builder: (context) => const LeavesScreen()),
         );
 
+      } else if(_selectedDestination == 5){
+
+        SharedPreferences preferences = await SharedPreferences.getInstance();
+        await preferences.clear();
+        Navigator.pushReplacement(
+          context,
+          MaterialPageRoute(builder: (context) => const SplashScreen()),
+        );
       }
     });
   }
@@ -213,6 +313,13 @@ class _DrawerState extends State<DrawerScreen> {
       _imageFile = pickedFile!;
       Navigator.pop(context);
     });
+  }
+
+   initialization() async {
+    setState(() async {
+      prefs = await SharedPreferences.getInstance();
+    });
+
   }
 
 

@@ -16,7 +16,7 @@ import 'package:http/http.dart' as http;
 
 class ApiService {
 
-  Future<Login_Responce?> getUsers(Map<String, String> body, BuildContext context) async {
+  Future<Login_Responce?> login(Map<String, String> body, BuildContext context) async {
     EasyLoading.show(status: 'loading...');
     final prefs = await SharedPreferences.getInstance();
     try {
@@ -35,6 +35,7 @@ class ApiService {
         //
         // prefs.setString(PrefrenceConst.networks, _NetworkJson);
         prefs.setBool(PrefrenceConst.isLogin, true);
+        ApiService().getConfiguration(context);
         EasyLoading.showSuccess(_model.message!);
 
         Navigator.pushReplacement(
@@ -91,6 +92,7 @@ class ApiService {
     EasyLoading.show(status: 'loading...');
     final prefs = await SharedPreferences.getInstance();
     String token = prefs.getString(PrefrenceConst.acessToken)!;
+    print (jsonEncode(body));
     try {
       var url = Uri.parse(ApiConstants.baseUrl + ApiConstants.updateEvent);
       var response = await http.post(url, body: body, headers: {
@@ -119,7 +121,7 @@ class ApiService {
   }
 
 
-  Future<CreateEvent_Responce?> submitPlan(Map<String, String> body, BuildContext context) async {
+  Future<CreateEvent_Responce?> submitPlan(Map<String, String> body, BuildContext context, String month) async {
     EasyLoading.show(status: 'loading...');
     final prefs = await SharedPreferences.getInstance();
     String token = prefs.getString(PrefrenceConst.acessToken)!;
@@ -132,7 +134,7 @@ class ApiService {
       if (response.statusCode == 200) {
 
         EasyLoading.dismiss();
-        EasyLoading.showSuccess('Plan submitted!');
+        AlertDialogue().showAlertDialog(context, "Alert", "${"Plan for " + month +" is submitted."}");
         CreateEvent_Responce responce = createResponceFromJson(response.body);
         Navigator.pushReplacement(
           context,
@@ -149,10 +151,6 @@ class ApiService {
 
     }
   }
-
-
-
-
 
 
   getConfiguration(BuildContext context) async {
@@ -182,4 +180,8 @@ class ApiService {
       AlertDialogue().showAlertDialog(context, "Alert Dialogue", "$error");
     }
   }
+
+
+
+
 }

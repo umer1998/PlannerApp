@@ -8,7 +8,6 @@ String configResponceInToJson(Configurations user) => json.encode(user.toJson())
 ConData conDataFromJson(String str) => ConData.fromJson(json.decode(str));
 
 String conDataInToJson(ConData user) => json.encode(user.toJson());
-
 class Configurations {
   bool? success;
   ConData? data;
@@ -122,18 +121,26 @@ class Purposes {
   String? purposeName;
   String? purposeCode;
   String? purposeColorCode;
+  List<FeedbackQuestionnaire>? feedbackQuestionnaire;
 
   Purposes(
       {this.purposeId,
         this.purposeName,
         this.purposeCode,
-        this.purposeColorCode});
+        this.purposeColorCode,
+        this.feedbackQuestionnaire});
 
   Purposes.fromJson(Map<String, dynamic> json) {
     purposeId = json['purpose_id'];
     purposeName = json['purpose_name'];
     purposeCode = json['purpose_code'];
     purposeColorCode = json['purpose_color_code'];
+    if (json['feedback_questionnaire'] != null) {
+      feedbackQuestionnaire = <FeedbackQuestionnaire>[];
+      json['feedback_questionnaire'].forEach((v) {
+        feedbackQuestionnaire!.add(new FeedbackQuestionnaire.fromJson(v));
+      });
+    }
   }
 
   Map<String, dynamic> toJson() {
@@ -142,6 +149,35 @@ class Purposes {
     data['purpose_name'] = this.purposeName;
     data['purpose_code'] = this.purposeCode;
     data['purpose_color_code'] = this.purposeColorCode;
+    if (this.feedbackQuestionnaire != null) {
+      data['feedback_questionnaire'] =
+          this.feedbackQuestionnaire!.map((v) => v.toJson()).toList();
+    }
+    return data;
+  }
+}
+
+class FeedbackQuestionnaire {
+  int? id;
+  String? type;
+  String? question;
+  List<String>? mcqs;
+
+  FeedbackQuestionnaire({this.id, this.type, this.question, this.mcqs});
+
+  FeedbackQuestionnaire.fromJson(Map<String, dynamic> json) {
+    id = json['id'];
+    type = json['type'];
+    question = json['question'];
+    mcqs = json['mcqs'].cast<String>();
+  }
+
+  Map<String, dynamic> toJson() {
+    final Map<String, dynamic> data = new Map<String, dynamic>();
+    data['id'] = this.id;
+    data['type'] = this.type;
+    data['question'] = this.question;
+    data['mcqs'] = this.mcqs;
     return data;
   }
 }

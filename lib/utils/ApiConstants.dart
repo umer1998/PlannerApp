@@ -15,5 +15,9 @@ class ApiConstants {
   static String getReportingTeam = 'getReportingTeam';
   static String getPendingApproval = 'getPendingApproval';
 
+  static String approveEvents = 'approveEvents';
+  static String postFeedback = 'postFeedback';
+  static String replaceEventPlusFeedback = 'replaceEventPlusFeedback';
+
 }
 
