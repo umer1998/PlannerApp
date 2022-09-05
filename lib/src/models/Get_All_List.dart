@@ -11,23 +11,16 @@ DataallList getdataallResponceFromJson(String str) => DataallList.fromJson(json.
 
 String getdataallResponceInToJson(DataallList user) => json.encode(user.toJson());
 
-
-
 class Get_All_List {
   bool? success;
-  List<DataallList>? data;
+  Data? data;
   String? message;
 
   Get_All_List({this.success, this.data, this.message});
 
   Get_All_List.fromJson(Map<String, dynamic> json) {
     success = json['success'];
-    if (json['data'] != null) {
-      data = <DataallList>[];
-      json['data'].forEach((v) {
-        data!.add(new DataallList.fromJson(v));
-      });
-    }
+    data = json['data'] != null ? new Data.fromJson(json['data']) : null;
     message = json['message'];
   }
 
@@ -35,9 +28,42 @@ class Get_All_List {
     final Map<String, dynamic> data = new Map<String, dynamic>();
     data['success'] = this.success;
     if (this.data != null) {
-      data['data'] = this.data!.map((v) => v.toJson()).toList();
+      data['data'] = this.data!.toJson();
     }
     data['message'] = this.message;
+    return data;
+  }
+}
+
+class Data {
+  List<DataallList>? events;
+  List<Plans>? plans;
+
+  Data({this.events, this.plans});
+
+  Data.fromJson(Map<String, dynamic> json) {
+    if (json['events'] != null) {
+      events = <DataallList>[];
+      json['events'].forEach((v) {
+        events!.add(new DataallList.fromJson(v));
+      });
+    }
+    if (json['plans'] != null) {
+      plans = <Plans>[];
+      json['plans'].forEach((v) {
+        plans!.add(new Plans.fromJson(v));
+      });
+    }
+  }
+
+  Map<String, dynamic> toJson() {
+    final Map<String, dynamic> data = new Map<String, dynamic>();
+    if (this.events != null) {
+      data['events'] = this.events!.map((v) => v.toJson()).toList();
+    }
+    if (this.plans != null) {
+      data['plans'] = this.plans!.map((v) => v.toJson()).toList();
+    }
     return data;
   }
 }
@@ -83,6 +109,28 @@ class DataallList {
     data['planned_on'] = this.plannedOn;
     data['event_status'] = this.eventStatus;
     data['execution_status'] = this.executionStatus;
+    return data;
+  }
+}
+
+class Plans {
+  String? plan;
+  String? month;
+  int? status;
+
+  Plans({this.plan, this.month, this.status});
+
+  Plans.fromJson(Map<String, dynamic> json) {
+    plan = json['plan'];
+    month = json['month'];
+    status = json['status'];
+  }
+
+  Map<String, dynamic> toJson() {
+    final Map<String, dynamic> data = new Map<String, dynamic>();
+    data['plan'] = this.plan;
+    data['month'] = this.month;
+    data['status'] = this.status;
     return data;
   }
 }

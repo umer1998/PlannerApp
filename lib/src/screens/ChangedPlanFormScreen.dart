@@ -20,11 +20,11 @@ import '../models/FeedBackSubmission.dart';
 
 
 class ChangedPlanFormScreen extends StatefulWidget {
-  const ChangedPlanFormScreen({Key? key, required this.eventPurpose, required this.event, required this.event_id, required this.newEvent,  }) : super(key: key);
-  final String eventPurpose;
-  final String event;
+   ChangedPlanFormScreen({Key? key, required this.event_id, required this.newEvent,  required this.questionnaire  }) : super(key: key);
+
   final String event_id;
   final NewEvent newEvent;
+  final List<FeedbackQuestionnaire> questionnaire ;
 
   @override
   _FormScreenState createState() => _FormScreenState();
@@ -35,12 +35,11 @@ class _FormScreenState extends State<ChangedPlanFormScreen> {
   final Map textFieldMap = Map<String, String>();
   final Map radioMap = Map<String, String>();
 
-  late List<FeedbackQuestionnaire> questionnaire =[];
+
 
   @override
   void initState() {
 
-    setData();
     super.initState();
   }
 
@@ -117,18 +116,18 @@ class _FormScreenState extends State<ChangedPlanFormScreen> {
                     child: ListView.builder(
                       shrinkWrap: true,
                       scrollDirection: Axis.vertical,
-                      itemCount: questionnaire.length,
+                      itemCount: widget.questionnaire.length,
                       itemBuilder: (context, index) {
-                        if(questionnaire[index].type == "textfield"){
+                        if(widget.questionnaire[index].type == "textfield"){
                           return Wrap(
                             children: [
                               DynamicTextField(
-                                hint: questionnaire[index].question!, id: questionnaire[index].id!.toString() , textFieldMap: radioMap,)
+                                hint: widget.questionnaire[index].question!, id: widget.questionnaire[index].id!.toString() , textFieldMap: radioMap,)
                             ],
                           );
-                        } else if(questionnaire[index].type == "radiobutton"){
+                        } else if(widget.questionnaire[index].type == "radiobutton"){
 
-                          return DynamicRadio(list: questionnaire[index].mcqs!, hint: questionnaire[index].question!, id: questionnaire[index].id!.toString(), radioMap: radioMap,);
+                          return DynamicRadio(list: widget.questionnaire[index].mcqs!, hint: widget.questionnaire[index].question!, id: widget.questionnaire[index].id!.toString(), radioMap: radioMap,);
                         } else {
                           return Center(
                             child: Text(""),
@@ -230,25 +229,6 @@ class _FormScreenState extends State<ChangedPlanFormScreen> {
   }
 
 
-  void setData() async{
-    final prefs = await SharedPreferences.getInstance();
-
-    String json = prefs!.getString(PrefrenceConst.events)!;
-    ConData _model = conDataFromJson(json);
-    for(int i= 0; i< _model.events!.length; i++){
-      if(_model.events![i].eventNameLabel == widget.event){
-        for(int j=0; j<_model.events![i].purposes!.length; i++ ){
-          if(_model.events![i].purposes![j].purposeName == widget.eventPurpose){
-            setState(() {
-              questionnaire = _model.events![i].purposes![j].feedbackQuestionnaire!;
-              return;
-            });
-
-          }
-        }
-      }
-    }
-  }
 
   submittForm(BuildContext context, Map body ) async {
     EasyLoading.show(status: 'loading...');

@@ -2,13 +2,21 @@
 import 'dart:io';
 
 import 'package:flutter/material.dart';
+import 'package:flutter_easyloading/flutter_easyloading.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:plannerapp/src/leaves/LeavesScreen.dart';
+import 'package:plannerapp/src/screens/ApprovalList.dart';
 import 'package:plannerapp/src/screens/DashboardScreen.dart';
 import 'package:plannerapp/src/screens/ExecutionList.dart';
+import 'package:plannerapp/src/screens/PlannedScreen.dart';
 import 'package:plannerapp/src/screens/SplashScreen.dart';
 import 'package:plannerapp/utils/Prefrences.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:http/http.dart' as http;
+
+import '../../utils/ApiConstants.dart';
+import '../../utils/alertdialogue.dart';
+import '../models/Leaves_Response.dart';
 
 
 
@@ -21,13 +29,20 @@ class DrawerScreen extends StatefulWidget {
 
 class _DrawerState extends State<DrawerScreen> {
 
-  late final prefs ;
+  late Leaves_Response leaves_response ;
+  late String name = "";
+  late String designation = "";
+  List<Data> pendingList= [];
+  List<Data> approvedList= [];
+  List<Data> rejectedList= [];
+  String image = "";
 
   @override
   void initState() {
-
+    getPrefrences();
+    getLeavesResponse();
     super.initState();
-      initialization();
+
 
   }
 
@@ -59,7 +74,7 @@ class _DrawerState extends State<DrawerScreen> {
 
                     image: DecorationImage(
                       image: AssetImage(
-                        'asset/img/shape.png',
+                        'assets/img/drawershape.png',
                       ),
                       fit: BoxFit.fill,),
                   ),
@@ -75,10 +90,15 @@ class _DrawerState extends State<DrawerScreen> {
                               mainAxisAlignment: MainAxisAlignment.start,
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
-                                Icon(
-                                  Icons.arrow_back_ios_outlined,
-                                  size: 20,
-                                  color: Colors.grey,
+                                GestureDetector(
+                                  onTap : (){
+                                    Navigator.pop(context);
+                                  },
+                                  child: Icon(
+                                    Icons.arrow_back_ios_outlined,
+                                    size: 20,
+                                    color: Colors.grey,
+                                  ),
                                 ),
                               ],
                             ),
@@ -90,7 +110,7 @@ class _DrawerState extends State<DrawerScreen> {
                               width: 90,
                               decoration: BoxDecoration(
                                 image: DecorationImage(
-                                    image: AssetImage("asset/img/person.png"),
+                                    image: AssetImage("assets/img/person.png"),
                                     fit: BoxFit.fitHeight),
                                 shape: BoxShape.circle,
                                 border: Border.all(
@@ -109,7 +129,7 @@ class _DrawerState extends State<DrawerScreen> {
                               children: [
                                 Center(
                                   child: Text(
-                                    "${prefs.getString(PrefrenceConst.userName)}",
+                                    "${name}",
                                     style: TextStyle(
                                         fontFamily: "semibold",
                                         fontSize: 18,
@@ -123,7 +143,7 @@ class _DrawerState extends State<DrawerScreen> {
                               height: 3,
                             ),
                             Text(
-                                "${prefs.getString(PrefrenceConst.userDesignation)}",
+                                "${designation}",
                               style: TextStyle(
                                   fontFamily: "regular",
                                   fontSize: 15,
@@ -135,66 +155,72 @@ class _DrawerState extends State<DrawerScreen> {
                     ],
                   ),
                 ),
-                Divider(
-                  height: 1,
-                  thickness: 1,
-                ),
+
                 ListTile(
-                  leading: Image.asset('assets/img/home.png',height: 20, width: 20, ),
+                  leading: Image.asset('assets/img/home.png',height: 20, width: 20, color: Colors.grey, ),
                   title: Text('Home', style: TextStyle(
                     fontWeight: FontWeight.w500,
-                    fontSize: 18
+                    fontSize: 18,
+                    color: Color(0xff404042)
                   ),),
                   selected: _selectedDestination == 0,
                   onTap: () => selectDestination(0),
                 ),
                 ListTile(
-                  leading: Image.asset('assets/img/executed.png',height: 20, width: 20, ),
+                  leading: Image.asset('assets/img/executed.png',height: 20, width: 20,  color: Colors.grey,),
                   title: Text('Planned List', style: TextStyle(
                       fontWeight: FontWeight.w500,
-                      fontSize: 18
+                      fontSize: 18,
+                      color: Color(0xff404042)
+
                   ),),
                   selected: _selectedDestination == 1,
                   onTap: () => selectDestination(1),
                 ),
                 ListTile(
-                  leading: Image.asset('assets/img/plans.png',height: 20, width: 20,  ),
+                  leading: Image.asset('assets/img/plans.png',height: 20, width: 20, color: Colors.grey, ),
                   title: Text('Executed List', style: TextStyle(
                       fontWeight: FontWeight.w500,
-                      fontSize: 18
+                      fontSize: 18,
+                      color: Color(0xff404042)
+
                   ),),
                   selected: _selectedDestination == 2,
                   onTap: () => selectDestination(2),
                 ),
                 ListTile(
-                  leading: Image.asset('assets/img/approval.png',height: 20, width: 20,  ),
+                  leading: Image.asset('assets/img/approval.png',height: 20, width: 20, color: Colors.grey,  ),
                   title: Text('Approval List', style: TextStyle(
                       fontWeight: FontWeight.w500,
-                      fontSize: 18
+                      fontSize: 18,
+                      color: Color(0xff404042)
                   ),),
                   selected: _selectedDestination == 3,
                   onTap: () => selectDestination(3),
                 ),
-
+                ListTile(),
                 Divider(
                   height: 1,
                   thickness: 1,
                 ),
+            ListTile(),
 
                 ListTile(
-                  leading: Icon(Icons.weekend , size: 20,),
+                  leading: Icon(Icons.weekend , size: 20, color: Colors.grey,),
                   title: Text('Leaves List', style: TextStyle(
                       fontWeight: FontWeight.w500,
-                      fontSize: 18
+                      fontSize: 18,
+                      color: Color(0xff404042)
                   ),),
                   selected: _selectedDestination == 4,
                   onTap: () => selectDestination(4),
                 ),
                 ListTile(
-                  leading: Icon(Icons.logout, size: 20,),
+                  leading: Icon(Icons.logout, size: 20, color: Colors.grey,),
                   title: Text('Logout', style: TextStyle(
                       fontWeight: FontWeight.w500,
-                      fontSize: 18
+                      fontSize: 18,
+                      color: Color(0xff404042)
                   ),),
                   selected: _selectedDestination == 5,
                   onTap: () => selectDestination(5),
@@ -214,7 +240,7 @@ class _DrawerState extends State<DrawerScreen> {
       if(_selectedDestination == 4){
         Navigator.push(
           context,
-          MaterialPageRoute(builder: (context) => const LeavesScreen()),
+          MaterialPageRoute(builder: (context) =>  LeavesScreen(pendingList : pendingList, approvedList: approvedList, rejectedList: rejectedList)),
         );
 
       } else if(_selectedDestination == 5){
@@ -225,6 +251,42 @@ class _DrawerState extends State<DrawerScreen> {
           context,
           MaterialPageRoute(builder: (context) => const SplashScreen()),
         );
+      } else if(_selectedDestination == 0){
+
+
+        Navigator.pushReplacement(
+          context,
+          MaterialPageRoute(builder: (context) => const DashboardScreen()),
+        );
+      }
+      else if(_selectedDestination == 1){
+
+
+        Navigator.pushReplacement(
+          context,
+          MaterialPageRoute(builder: (context) => const PlannedScreen()),
+        );
+      }
+      else if(_selectedDestination == 2){
+
+
+        Navigator.pushReplacement(
+          context,
+          MaterialPageRoute(builder: (context) => const ExecutionList()),
+        );
+      }
+      else if(_selectedDestination == 3){
+
+        if(designation == "AM"){
+
+        } else {
+
+          Navigator.pushReplacement(
+            context,
+            MaterialPageRoute(builder: (context) => const ApprovalList()),
+          );
+        }
+
       }
     });
   }
@@ -242,9 +304,7 @@ class _DrawerState extends State<DrawerScreen> {
           child: Center(
             child: CircleAvatar(
               radius: 34,
-              backgroundImage: _imageFile == null
-                  ? Image.asset("assets/img/profile.png" , fit: BoxFit.fill,).image
-                  : FileImage(File(_imageFile!.path)),
+              backgroundImage:  NetworkImage(image),
             ),
           )
         // CircleAvatar(
@@ -315,13 +375,61 @@ class _DrawerState extends State<DrawerScreen> {
     });
   }
 
-   initialization() async {
-    setState(() async {
-      prefs = await SharedPreferences.getInstance();
-    });
+  void getPrefrences() async {
+    try {
+      SharedPreferences pref = await SharedPreferences.getInstance();
+
+      setState(() {
+        image  = pref.getString(PrefrenceConst.image) == null ? "" : pref.getString(PrefrenceConst.image)!.replaceAll("\"", "")!;
+
+        name = pref.getString(PrefrenceConst.userName)!;
+        designation = pref.getString(PrefrenceConst.userDesignation)!;
+      });
+    } catch (e) {}
+  }
+  getLeavesResponse() async {
+
+    EasyLoading.show(status: 'loading...');
+    final prefs = await SharedPreferences.getInstance();
+    String token = prefs.getString(PrefrenceConst.acessToken)!;
+    try {
+      var url = Uri.parse(ApiConstants.baseUrl + ApiConstants.getLeaves);
+      var response = await http.get(url, headers: {
+        "Accept": 'application/json',
+        'Authorization': 'Bearer $token',
+        "Content-Type": "application/json"
+      });
+      if (response.statusCode == 200) {
+        EasyLoading.dismiss();
+
+        print("success");
+        setState(() {
+          leaves_response = getleavesResponceFromJson(response.body);
+          for(int i = 0; i< leaves_response.data!.length; i++){
+            if(leaves_response.data![i].eventStatus == "pending"){
+              pendingList.add(leaves_response.data![i]);
+            } else if(leaves_response.data![i].eventStatus == "approved"){
+              approvedList.add(leaves_response.data![i]);
+            } else if(leaves_response.data![i].eventStatus == "rejected"){
+              rejectedList.add(leaves_response.data![i]);
+            }
+          }
+
+        });
+      } else {
+        print("error");
+        EasyLoading.dismiss();
+        AlertDialogue().showAlertDialog(
+            context, "Alert Dialogue", response.body.toString());
+      }
+    } catch (e) {
+      print("e");
+      EasyLoading.dismiss();
+      String error = e.toString();
+      AlertDialogue().showAlertDialog(context, "Alert Dialogue", "$error");
+    }
 
   }
-
 
 }
 

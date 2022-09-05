@@ -75,6 +75,8 @@ class PrefrenceConst{
   static String networks = 'networks';
   static String events = 'events';
   static String isLogin = 'islogin';
+  static String image = 'image';
+
 
   static String executionList = 'executionList';
 

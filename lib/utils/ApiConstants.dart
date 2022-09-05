@@ -2,6 +2,7 @@ class ApiConstants {
   static String baseUrl = 'http://13.95.146.210/visit-app/public/api/';
 
   static String login = 'authorize/login';
+  static String forgetPassword = 'authorize/forgetPassword';
   static String dayPlanner = 'dayPlanner';
   static String executedPlans = 'executedPlans';
   static String dashboard = 'dashboard';
@@ -18,6 +19,9 @@ class ApiConstants {
   static String approveEvents = 'approveEvents';
   static String postFeedback = 'postFeedback';
   static String replaceEventPlusFeedback = 'replaceEventPlusFeedback';
+
+  static String uploadProfileImage = 'uploadProfileImage';
+
 
 }
 

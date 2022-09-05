@@ -35,7 +35,7 @@ class ApiService {
         //
         // prefs.setString(PrefrenceConst.networks, _NetworkJson);
         prefs.setBool(PrefrenceConst.isLogin, true);
-        ApiService().getConfiguration(context);
+
         EasyLoading.showSuccess(_model.message!);
 
         Navigator.pushReplacement(
@@ -58,6 +58,7 @@ class ApiService {
 
 
   Future<CreateEvent_Responce?> createEvent(Map<String, String> body, BuildContext context) async {
+    print("body");
     EasyLoading.show(status: 'loading...');
     final prefs = await SharedPreferences.getInstance();
     String token = prefs.getString(PrefrenceConst.acessToken)!;
@@ -89,6 +90,7 @@ class ApiService {
 
 
   Future<CreateEvent_Responce?> editEvent(Map<String, String> body, BuildContext context) async {
+    print (body);
     EasyLoading.show(status: 'loading...');
     final prefs = await SharedPreferences.getInstance();
     String token = prefs.getString(PrefrenceConst.acessToken)!;
@@ -102,7 +104,6 @@ class ApiService {
       if (response.statusCode == 200) {
         EasyLoading.dismiss();
         CreateEvent_Responce responce = createResponceFromJson(response.body);
-        EasyLoading.showSuccess("Event updated successfully!");
 
         Navigator.pushReplacement(
           context,
@@ -134,7 +135,6 @@ class ApiService {
       if (response.statusCode == 200) {
 
         EasyLoading.dismiss();
-        AlertDialogue().showAlertDialog(context, "Alert", "${"Plan for " + month +" is submitted."}");
         CreateEvent_Responce responce = createResponceFromJson(response.body);
         Navigator.pushReplacement(
           context,
@@ -167,8 +167,10 @@ class ApiService {
         Configurations _model = configResponceFromJson(response.body);
 
         String _eventJson = jsonEncode(_model.data!);
+        String image = jsonEncode(_model.data!.userImage);
 
-
+        prefs.setString(PrefrenceConst.image, image);
+        print(image);
         prefs.setString(PrefrenceConst.events, _eventJson);
 
       } else {
@@ -177,10 +179,54 @@ class ApiService {
       }
     } catch (e) {
       String error = e.toString();
-      AlertDialogue().showAlertDialog(context, "Alert Dialogue", "$error");
+      if(error.contains("Connection failed")){
+
+      } else {
+        AlertDialogue().showAlertDialog(context, "Alert Dialogue", "$error");
+      }
+
     }
   }
 
+  getImage(BuildContext context , Map<String, String> body ) async {
+    EasyLoading.show(status: 'loading...');
+
+    final prefs = await SharedPreferences.getInstance();
+    String token = prefs.getString(PrefrenceConst.acessToken)!;
+    print(body);
+    try {
+      var url = Uri.parse(ApiConstants.baseUrl + ApiConstants.uploadProfileImage);
+      var response = await http.post(url, body : body,  headers: {
+        "Accept": 'application/json',
+        'Authorization': 'Bearer $token'
+      });
+      if (response.statusCode == 200) {
+        EasyLoading.dismiss();
+
+        Navigator.pushReplacement(
+          context,
+          MaterialPageRoute(builder: (context) => const HomeScreen()),
+        );
+
+      } else {
+        EasyLoading.dismiss();
+
+        AlertDialogue().showAlertDialog(
+            context, "Alert Dialogue", response.body.toString());
+      }
+    } catch (e) {
+      EasyLoading.dismiss();
+
+      String error = e.toString();
+      if(error.contains("Connection failed")){
+
+      } else {
+
+        AlertDialogue().showAlertDialog(context, "Alert Dialogue", "$error");
+      }
+
+    }
+  }
 
 
 

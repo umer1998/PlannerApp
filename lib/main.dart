@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_easyloading/flutter_easyloading.dart';
 
 import 'package:plannerapp/src/screens/SplashScreen.dart';
+import 'package:plannerapp/style/colors.dart';
 
 
 
@@ -21,10 +22,18 @@ class MyApp extends StatelessWidget {
       debugShowCheckedModeBanner: false,
       title: 'Flutter Demo',
       theme: ThemeData(
-        primarySwatch: Colors.green,
-        primaryColor: Colors.white,
+        colorScheme: ColorScheme.fromSwatch().copyWith(
+
+
+
+          // or from RGB
+
+          primary: const Color(0xff0F6742),
+          secondary: const Color(0xff0F6742),
+
+        ),
       ),
-      home: Home(),
+      home: SafeArea(child: Home()),
       builder: EasyLoading.init(),
     );
   }

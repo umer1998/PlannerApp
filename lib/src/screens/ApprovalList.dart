@@ -101,123 +101,126 @@ class _ExecutionListState extends State<ApprovalList> {
               ),
 
               Expanded(
-                child: Container(
-                  decoration: BoxDecoration(
-                    image: DecorationImage(
-                        image: AssetImage('assets/img/bg.jpg'), fit: BoxFit.fill),
-                  ),
-                  child: ListView.builder(
-                    scrollDirection: Axis.vertical,
-                    itemCount: get_managers.data!.length!,
-                    itemBuilder: (context, index) {
+                child: Padding(
+                  padding: const EdgeInsets.fromLTRB(0, 0, 0, 70),
+                  child: Container(
+                    decoration: BoxDecoration(
+                      image: DecorationImage(
+                          image: AssetImage('assets/img/bg.jpg'), fit: BoxFit.fill),
+                    ),
+                    child: ListView.builder(
+                      scrollDirection: Axis.vertical,
+                      itemCount: get_managers.data!.length!,
+                      itemBuilder: (context, index) {
 
 
-                      return Container(
-                        color: Colors.white.withOpacity(0.6),
-                        child: Column(
-                          children: [
-                            Padding(
-                              padding: const EdgeInsets.fromLTRB(15, 17, 15, 0),
-                              child: Row(
-                                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  Column(
-                                    mainAxisAlignment: MainAxisAlignment.start,
-                                    crossAxisAlignment: CrossAxisAlignment.start,
-                                    children: [
-                                      Text("${get_managers.data![index].fullname}",textAlign: TextAlign.start, style: TextStyle(
-                                          fontSize: 19,
-                                          fontWeight: FontWeight.w600,
-                                          color: Colors.black
-                                      ),),
+                        return Container(
+                          color: Colors.white.withOpacity(0.6),
+                          child: Column(
+                            children: [
+                              Padding(
+                                padding: const EdgeInsets.fromLTRB(15, 17, 15, 0),
+                                child: Row(
+                                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    Column(
+                                      mainAxisAlignment: MainAxisAlignment.start,
+                                      crossAxisAlignment: CrossAxisAlignment.start,
+                                      children: [
+                                        Text("${get_managers.data![index].fullname}",textAlign: TextAlign.start, style: TextStyle(
+                                            fontSize: 19,
+                                            fontWeight: FontWeight.w600,
+                                            color: Colors.black
+                                        ),),
 
-                                      SizedBox(height: 8,),
+                                        SizedBox(height: 8,),
 
-                                      Row(
-                                        children: [
-                                          Container(
-                                              height: 15,
-                                              width: 15,
-                                              decoration: BoxDecoration(),
-                                              child: FittedBox(
-                                                  child: Icon(
-                                                    Icons.location_on,
-                                                    color: Colors.grey,
-                                                  ),
-                                                  fit: BoxFit.fill)),
-
-
-
-                                          Text(
-                                            "${get_managers.data![index].designation}",
-                                            style: TextStyle(
-                                                fontFamily: "regular",
-                                                fontSize: 15,
-                                                color: Colors.grey),
-                                          ),
-                                        ],
-                                      ),
+                                        Row(
+                                          children: [
+                                            Container(
+                                                height: 15,
+                                                width: 15,
+                                                decoration: BoxDecoration(),
+                                                child: FittedBox(
+                                                    child: Icon(
+                                                      Icons.location_on,
+                                                      color: Colors.grey,
+                                                    ),
+                                                    fit: BoxFit.fill)),
 
 
-                                    ],
-                                  ),
 
-                                  InkWell(
-                                    onTap: (){
-                                      Navigator.push(
-                                        context,
-                                        MaterialPageRoute(builder: (context) =>  ApproveReject(id : get_managers!.data![index].userId! , name: get_managers!.data![index].fullname!,)),
-                                      );
-                                    },
-                                    child: Padding(
-                                      padding: const EdgeInsets.fromLTRB(0, 8, 0, 0),
-                                      child: Align(
-                                        alignment: Alignment.center,
-                                        child: Container(
-                                          width: 90,
-                                          height: 30,
-                                          decoration: BoxDecoration(
-
-                                            border: Border.all(
-                                              color: Color(0x759e9e9e),
-                                              style: BorderStyle.solid,
-                                              width: 1,
+                                            Text(
+                                              "${get_managers.data![index].designation}",
+                                              style: TextStyle(
+                                                  fontFamily: "regular",
+                                                  fontSize: 15,
+                                                  color: Colors.grey),
                                             ),
+                                          ],
+                                        ),
 
-                                            borderRadius: new BorderRadius.only(
-                                                topLeft: const Radius.circular(20.0),
-                                                bottomLeft: const Radius.circular(20.0),
-                                                topRight: const Radius.circular(20.0),
-                                                bottomRight: const Radius.circular(20.0)),
-                                          ),
-                                          child: Center(
-                                            child: Text("See Plans",style: TextStyle(
-                                                fontSize: 16,
-                                                fontWeight: FontWeight.w400,
-                                                color: Colors.grey
-                                            ),),
+
+                                      ],
+                                    ),
+
+                                    InkWell(
+                                      onTap: (){
+                                        Navigator.push(
+                                          context,
+                                          MaterialPageRoute(builder: (context) =>  ApproveReject(id : get_managers!.data![index].userId! , name: get_managers!.data![index].fullname!,)),
+                                        );
+                                      },
+                                      child: Padding(
+                                        padding: const EdgeInsets.fromLTRB(0, 8, 0, 0),
+                                        child: Align(
+                                          alignment: Alignment.center,
+                                          child: Container(
+                                            width: 90,
+                                            height: 30,
+                                            decoration: BoxDecoration(
+
+                                              border: Border.all(
+                                                color: Color(0x759e9e9e),
+                                                style: BorderStyle.solid,
+                                                width: 1,
+                                              ),
+
+                                              borderRadius: new BorderRadius.only(
+                                                  topLeft: const Radius.circular(20.0),
+                                                  bottomLeft: const Radius.circular(20.0),
+                                                  topRight: const Radius.circular(20.0),
+                                                  bottomRight: const Radius.circular(20.0)),
+                                            ),
+                                            child: Center(
+                                              child: Text("See Plans",style: TextStyle(
+                                                  fontSize: 16,
+                                                  fontWeight: FontWeight.w400,
+                                                  color: Colors.grey
+                                              ),),
+                                            ),
                                           ),
                                         ),
                                       ),
                                     ),
-                                  ),
 
-                                ],
+                                  ],
+                                ),
                               ),
-                            ),
-                            Padding(
-                              padding: const EdgeInsets.fromLTRB(0, 17, 0, 0),
-                              child: Container(
-                                height: 1,
-                                width: MediaQuery.of(context).size.width,
-                                color: Color(0x759e9e9e),
+                              Padding(
+                                padding: const EdgeInsets.fromLTRB(0, 17, 0, 0),
+                                child: Container(
+                                  height: 1,
+                                  width: MediaQuery.of(context).size.width,
+                                  color: Color(0x759e9e9e),
+                                ),
                               ),
-                            ),
-                          ],
-                        ),
-                      );
-                    },
+                            ],
+                          ),
+                        );
+                      },
+                    ),
                   ),
                 ),
               ),

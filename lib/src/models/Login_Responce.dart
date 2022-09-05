@@ -11,8 +11,6 @@ String getLoginResponceInToJson(Login_Responce user) => json.encode(user.toJson(
 Data getDataResponceFromJson(String str) => Data.fromJson(json.decode(str));
 
 String getDataResponceInToJson(Data user) => json.encode(user.toJson());
-
-
 class Login_Responce {
   bool? success;
   Data? data;
@@ -38,15 +36,13 @@ class Login_Responce {
 }
 
 class Data {
-  String? image;
   String? fullname;
   String? designation;
   String? token;
 
-  Data({this.image, this.fullname, this.designation, this.token});
+  Data({this.fullname, this.designation, this.token});
 
   Data.fromJson(Map<String, dynamic> json) {
-    image = json['image'];
     fullname = json['fullname'];
     designation = json['designation'];
     token = json['token'];
@@ -54,7 +50,6 @@ class Data {
 
   Map<String, dynamic> toJson() {
     final Map<String, dynamic> data = new Map<String, dynamic>();
-    data['image'] = this.image;
     data['fullname'] = this.fullname;
     data['designation'] = this.designation;
     data['token'] = this.token;

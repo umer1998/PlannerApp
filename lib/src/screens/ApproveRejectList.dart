@@ -201,159 +201,162 @@ class _ApproveRejectState extends State<ApproveReject> {
                   ),
                 ),
                 Expanded(
-                  child: Container(
-                      decoration: BoxDecoration(
-                        image: DecorationImage(
-                            image: AssetImage('assets/img/bg.jpg'),
-                            fit: BoxFit.fill),
-                      ),
-                      child: ListView.builder(
+                  child: Padding(
+                    padding: const EdgeInsets.fromLTRB(0, 0, 0, 70),
+                    child: Container(
+                        decoration: BoxDecoration(
+                          image: DecorationImage(
+                              image: AssetImage('assets/img/bg.jpg'),
+                              fit: BoxFit.fill),
+                        ),
+                        child: ListView.builder(
 
-                        scrollDirection: Axis.vertical,
-                        itemCount: getPendingApproval!.data!.length!,
-                        itemBuilder: (context, index) {
+                          scrollDirection: Axis.vertical,
+                          itemCount: getPendingApproval!.data!.length!,
+                          itemBuilder: (context, index) {
 
-                          double bottomMargin = 0;
-                          if(index == getPendingApproval!.data!.length!-1){
-                            bottomMargin = 100;
-                          }
+                            double bottomMargin = 0;
+                            if(index == getPendingApproval!.data!.length!-1 && index > 5){
+                              bottomMargin = 120;
+                            }
 
-                          return GestureDetector(
-                            onTap: () {
-                              setState(() {
-                                if(clickList == true){
-                                  if(listVisibility[index] == true){
-                                    listVisibility[index] = false;
-                                  } else {
-                                    listVisibility[index] = true;
+                            return GestureDetector(
+                              onTap: () {
+                                setState(() {
+                                  if(clickList == true){
+                                    if(listVisibility[index] == true){
+                                      listVisibility[index] = false;
+                                    } else {
+                                      listVisibility[index] = true;
+                                    }
+                                    if(listColor[index] == bgWhitewithOpacity){
+                                      listColor[index]  = bgGreenwithOpacity;
+
+
+                                      ApprovalRejectionFormat format = ApprovalRejectionFormat();
+                                      format.id = getPendingApproval!.data![index].id.toString();
+                                      format.plan = getPendingApproval!.data![index].plan;
+                                      map[getPendingApproval!.data![index].id!.toString()] =  format;
+                                    } else {
+                                      listColor[index] = bgWhitewithOpacity;
+                                      map.remove(getPendingApproval!.data![index].id.toString());
+
+                                    }
                                   }
-                                  if(listColor[index] == bgWhitewithOpacity){
-                                    listColor[index]  = bgGreenwithOpacity;
 
+                                });
+                              },
+                              child: Container(
+                                width: MediaQuery.of(context).size.width,
+                                decoration: BoxDecoration(color: listColor[index]),
+                                child: Wrap(
+                                  children: [
+                                    Column(
+                                      children: [
+                                        Padding(
+                                          padding: EdgeInsets.fromLTRB(15, 13, 15, bottomMargin),
+                                          child: Row(
+                                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                            children: [
+                                              Column(
+                                                mainAxisAlignment: MainAxisAlignment.start,
+                                                crossAxisAlignment: CrossAxisAlignment.start,
+                                                children: [
+                                                  Text(
+                                                    "${getPendingApproval!.data![index].event}",
+                                                    style: TextStyle(
+                                                        fontFamily: "bold",
+                                                        fontSize: 20,
+                                                        color: Colors.black),
+                                                  ),
+                                                  SizedBox(
+                                                    height: 5,
+                                                  ),
+                                                  Row(
+                                                    children: [
+                                                      Container(
+                                                          height: 15,
+                                                          width: 15,
+                                                          decoration: BoxDecoration(),
+                                                          child: FittedBox(
+                                                              child: Icon(
+                                                                Icons.calendar_today_outlined,
+                                                                color: Colors.grey,
+                                                              ),
+                                                              fit: BoxFit.fill)),
+                                                      SizedBox(
+                                                        width: 5,
+                                                      ),
+                                                      Text(
+                                                        "${getPendingApproval!.data![index].plannedOn}",
+                                                        style: TextStyle(
+                                                            fontFamily: "semibold",
+                                                            fontSize: 14,
+                                                            color: Color(0xff909089)),
+                                                      ),
+                                                    ],
+                                                  ),
+                                                  SizedBox(
+                                                    height: 5,
+                                                  ),
+                                                  Row(
+                                                    children: [
+                                                      Container(
+                                                          height: 15,
+                                                          width: 15,
+                                                          decoration: BoxDecoration(),
+                                                          child: FittedBox(
+                                                              child: Icon(
+                                                                Icons.location_on,
+                                                                color: Colors.grey,
+                                                              ),
+                                                              fit: BoxFit.fill)),
+                                                      SizedBox(
+                                                        width: 5,
+                                                      ),
+                                                      Text(
+                                                        "${getPendingApproval!.data![index].eventPurpose}",
+                                                        style: TextStyle(
+                                                            fontFamily: "regular",
+                                                            fontSize: 14,
+                                                            color: Color(0xff909089)),
+                                                      ),
+                                                    ],
+                                                  ),
+                                                ],
 
-                                    ApprovalRejectionFormat format = ApprovalRejectionFormat();
-                                    format.id = getPendingApproval!.data![index].id.toString();
-                                    format.plan = getPendingApproval!.data![index].plan;
-                                    map[getPendingApproval!.data![index].id!.toString()] =  format;
-                                  } else {
-                                    listColor[index] = bgWhitewithOpacity;
-                                    map.remove(getPendingApproval!.data![index].id.toString());
-
-                                  }
-                                }
-
-                              });
-                            },
-                            child: Container(
-                              width: MediaQuery.of(context).size.width,
-                              decoration: BoxDecoration(color: listColor[index]),
-                              child: Wrap(
-                                children: [
-                                  Column(
-                                    children: [
-                                      Padding(
-                                        padding: EdgeInsets.fromLTRB(15, 13, 15, bottomMargin),
-                                        child: Row(
-                                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                                          children: [
-                                            Column(
-                                              mainAxisAlignment: MainAxisAlignment.start,
-                                              crossAxisAlignment: CrossAxisAlignment.start,
-                                              children: [
-                                                Text(
-                                                  "${getPendingApproval!.data![index].event}",
-                                                  style: TextStyle(
-                                                      fontFamily: "bold",
-                                                      fontSize: 20,
-                                                      color: Colors.black),
-                                                ),
-                                                SizedBox(
-                                                  height: 5,
-                                                ),
-                                                Row(
-                                                  children: [
-                                                    Container(
-                                                        height: 15,
-                                                        width: 15,
-                                                        decoration: BoxDecoration(),
-                                                        child: FittedBox(
-                                                            child: Icon(
-                                                              Icons.calendar_today_outlined,
-                                                              color: Colors.grey,
-                                                            ),
-                                                            fit: BoxFit.fill)),
-                                                    SizedBox(
-                                                      width: 5,
-                                                    ),
-                                                    Text(
-                                                      "${getPendingApproval!.data![index].plannedOn}",
-                                                      style: TextStyle(
-                                                          fontFamily: "semibold",
-                                                          fontSize: 14,
-                                                          color: Color(0xff909089)),
-                                                    ),
-                                                  ],
-                                                ),
-                                                SizedBox(
-                                                  height: 5,
-                                                ),
-                                                Row(
-                                                  children: [
-                                                    Container(
-                                                        height: 15,
-                                                        width: 15,
-                                                        decoration: BoxDecoration(),
-                                                        child: FittedBox(
-                                                            child: Icon(
-                                                              Icons.location_on,
-                                                              color: Colors.grey,
-                                                            ),
-                                                            fit: BoxFit.fill)),
-                                                    SizedBox(
-                                                      width: 5,
-                                                    ),
-                                                    Text(
-                                                      "${getPendingApproval!.data![index].eventPurpose}",
-                                                      style: TextStyle(
-                                                          fontFamily: "regular",
-                                                          fontSize: 14,
-                                                          color: Color(0xff909089)),
-                                                    ),
-                                                  ],
-                                                ),
-                                              ],
-
-                                            ),
-                                            Visibility(
-                                              visible: listVisibility[index],
-                                              child: Container(
-                                                height: 25,
-                                                width: 25,
-                                                decoration: BoxDecoration(
-                                                  image: DecorationImage(
-                                                      image: AssetImage('assets/img/check.png',), fit: BoxFit.fill),
+                                              ),
+                                              Visibility(
+                                                visible: listVisibility[index],
+                                                child: Container(
+                                                  height: 25,
+                                                  width: 25,
+                                                  decoration: BoxDecoration(
+                                                    image: DecorationImage(
+                                                        image: AssetImage('assets/img/check.png',), fit: BoxFit.fill),
+                                                  ),
                                                 ),
                                               ),
-                                            ),
-                                          ],
+                                            ],
+                                          ),
                                         ),
-                                      ),
-                                      SizedBox(
-                                        height: 13,
-                                      ),
-                                      Container(
-                                        height: 1,
-                                        width: MediaQuery.of(context).size.width,
-                                        color: Color(0xffDCDCDC),
-                                      ),
-                                    ],
-                                  ),
-                                ],
+                                        SizedBox(
+                                          height: 13,
+                                        ),
+                                        Container(
+                                          height: 1,
+                                          width: MediaQuery.of(context).size.width,
+                                          color: Color(0xffDCDCDC),
+                                        ),
+                                      ],
+                                    ),
+                                  ],
+                                ),
                               ),
-                            ),
-                          );
-                        },
-                      )),
+                            );
+                          },
+                        )),
+                  ),
                 ),
               ],
             ),
@@ -365,7 +368,7 @@ class _ApproveRejectState extends State<ApproveReject> {
                 child: Container(
                   alignment: Alignment.center,
                   width: MediaQuery.of(context).size.width,
-                  height: 130,
+                  height: 170,
                   decoration: BoxDecoration(
                     gradient: LinearGradient(
                       begin: Alignment.topCenter,
@@ -519,7 +522,7 @@ class _ApproveRejectState extends State<ApproveReject> {
                 children: [
                   InkWell(
                     onTap: (){
-        Navigator.of(context).pop();
+                      Navigator.of(context, rootNavigator: true).pop();
       },
                     child: Container(
                       height: 30,
@@ -549,7 +552,7 @@ class _ApproveRejectState extends State<ApproveReject> {
               children: [
                 InkWell(
                   onTap: (){
-                    Navigator.of(context).pop();
+                    Navigator.of(context, rootNavigator: true).pop();
                   },
                   child: Container(
                     height: 35,
@@ -598,7 +601,7 @@ class _ApproveRejectState extends State<ApproveReject> {
                     approveEvent.ids = eventlist;
                     approveEvent.plannedBy = widget.id;
                     approveEvent.plan = getPendingApproval!.data![0].plan;
-
+                    Navigator.of(context, rootNavigator: true).pop();
                     getApproveReject(context, approveEvent.toJson());
                   },
                   child: Container(
@@ -647,7 +650,7 @@ class _ApproveRejectState extends State<ApproveReject> {
     print(jsonEncode(body));
     
     try {
-      var url = Uri.parse(ApiConstants.baseUrl + ApiConstants.approveEvents + "/${widget.id}");
+      var url = Uri.parse(ApiConstants.baseUrl + ApiConstants.approveEvents );
       var response = await http.post(url, headers: {
         "Accept": 'application/json',
         "Content-Type": "application/json",

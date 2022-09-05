@@ -33,13 +33,15 @@ class Configurations {
 }
 
 class ConData {
+  String? userImage;
   List<Events>? events;
   List<MeetingPlaces>? meetingPlaces;
   List<Network>? network;
 
-  ConData({this.events, this.meetingPlaces, this.network});
+  ConData({this.userImage, this.events, this.meetingPlaces, this.network});
 
   ConData.fromJson(Map<String, dynamic> json) {
+    userImage = json['user_image'];
     if (json['events'] != null) {
       events = <Events>[];
       json['events'].forEach((v) {
@@ -62,6 +64,7 @@ class ConData {
 
   Map<String, dynamic> toJson() {
     final Map<String, dynamic> data = new Map<String, dynamic>();
+    data['user_image'] = this.userImage;
     if (this.events != null) {
       data['events'] = this.events!.map((v) => v.toJson()).toList();
     }

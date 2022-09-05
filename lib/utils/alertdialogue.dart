@@ -9,6 +9,7 @@ class AlertDialogue{
       child: Text("Ok"),
       onPressed: () {
         Navigator.of(context, rootNavigator: true).pop();
+
       },
     );
 
