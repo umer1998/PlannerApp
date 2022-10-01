@@ -46,15 +46,15 @@ class _LeavesScreenState extends State<LeavesScreen> with SingleTickerProviderSt
       }
     });
     _controller = TabController(length: 3, vsync: this);
-
+    pendingList = widget.pendingList;
+    approvedList = widget.approvedList;
+    rejectedList = widget.rejectedList;
    // /
   }
 
   @override
   Widget build(BuildContext context) {
-    pendingList = widget.pendingList;
-    approvedList = widget.approvedList;
-    rejectedList = widget.rejectedList;
+
 
     return MaterialApp(
       home: Scaffold(
@@ -71,45 +71,7 @@ class _LeavesScreenState extends State<LeavesScreen> with SingleTickerProviderSt
                     length: 3,
                     child:Column(
                       children: [
-                        Padding(
-                          padding: const EdgeInsets.fromLTRB(15, 20, 15, 25),
-                          child: Row(
-                            crossAxisAlignment: CrossAxisAlignment.center,
-                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                            children: [
 
-                              GestureDetector(
-                                onTap: (){
-                                  Navigator.pushReplacement(
-                                    context,
-                                    MaterialPageRoute(builder: (context) => const HomeScreen()),
-                                  );
-                                },
-                                child: Icon(
-                                  Icons.arrow_back_ios_outlined,
-                                  color: Colors.grey,
-                                  size: 25.0,
-                                ),
-                              ),
-
-                              Align(
-                                alignment: Alignment.center,
-                                child: Text(
-                                  "Leaves",
-                                  style: TextStyle(
-                                      fontFamily: "bold",
-                                      fontSize: 27,
-                                      color: Colors.black),
-                                ),
-                              ),
-
-                              Container(
-                                height: 20,
-                                width: 20,
-                              )
-                            ],
-                          ),
-                        ),
                         Container(
                           height: 1,
                           width: MediaQuery.of(context).size.width,

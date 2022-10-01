@@ -1,0 +1,337 @@
+import 'dart:async';
+
+import 'package:animated_segmented_tab_control/animated_segmented_tab_control.dart';
+import 'package:flutter/cupertino.dart';
+import 'package:flutter/material.dart';
+import 'package:flutter_easyloading/flutter_easyloading.dart';
+import 'package:intl/intl.dart';
+import 'package:plannerapp/style/colors.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+import 'package:http/http.dart' as http;
+
+import '../../utils/ApiConstants.dart';
+import '../../utils/Prefrences.dart';
+import '../../utils/alertdialogue.dart';
+import '../initialscrrens/HomeScreen.dart';
+import '../models/Leaves_Response.dart';
+
+class ScreenLeaves extends StatefulWidget {
+  const ScreenLeaves({Key? key}) : super(key: key);
+
+  @override
+  _ScreenLeavesState createState() => _ScreenLeavesState();
+}
+class _ScreenLeavesState extends State<ScreenLeaves> {
+
+
+  late Leaves_Response leaves_response ;
+  Timer? _timer;
+
+  List<Data> pendingList= [];
+  List<Data> approvedList= [];
+  List<Data> rejectedList= [];
+
+
+  @override
+  void initState() {
+    super.initState();
+    getLeavesResponse();
+    EasyLoading.addStatusCallback((status) {
+      print('EasyLoading Status $status');
+      if (status == EasyLoadingStatus.dismiss) {
+        _timer?.cancel();
+      }
+    });
+
+  }
+
+
+  @override
+  Widget build(BuildContext context) {
+
+    return Scaffold(
+      // Provide the [TabController]
+      body: DefaultTabController(
+        length: 3,
+        child: Scaffold(
+          body: SafeArea(
+            child: Stack(
+              children: [
+                Container(
+                  height: 90,
+                  width: MediaQuery.of(context).size.width,
+                  child: Padding(
+                    padding: const EdgeInsets.fromLTRB(15, 20, 15, 10),
+                    child: Row(
+                      crossAxisAlignment: CrossAxisAlignment.center,
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+
+                        GestureDetector(
+                          onTap: (){
+                            Navigator.pushReplacement(
+                              context,
+                              MaterialPageRoute(builder: (context) => const HomeScreen()),
+                            );
+                          },
+                          child: Icon(
+                            Icons.arrow_back_ios_outlined,
+                            color: Colors.grey,
+                            size: 25.0,
+                          ),
+                        ),
+
+                        Align(
+                          alignment: Alignment.center,
+                          child: Text(
+                            "Leaves",
+                            style: TextStyle(
+                                fontFamily: "bold",
+                                fontSize: 27,
+                                color: Colors.black),
+                          ),
+                        ),
+
+                        Container(
+                          height: 20,
+                          width: 20,
+                        )
+                      ],
+                    ),
+                  ),
+                ),
+                Padding(
+                  padding: const EdgeInsets.fromLTRB(0, 100, 0, 0),
+                  child: Container(
+                    height: 1,
+                    width: MediaQuery.of(context).size.width,
+                    color: Color(0x759e9e9e),
+                  ),
+                ),
+                Padding(
+                  padding: const EdgeInsets.fromLTRB(16, 110, 16, 0),
+                  child: SegmentedTabControl(
+                    // Customization of widget
+                    radius: const Radius.circular(3),
+                    backgroundColor: Colors.grey.shade300,
+                    indicatorColor: AppColors.bgGreen,
+                    tabTextColor: Colors.black45,
+                    selectedTabTextColor: Colors.white,
+                    squeezeIntensity: 2,
+                    height: 45,
+                    tabPadding: const EdgeInsets.symmetric(horizontal: 8),
+                    textStyle: Theme.of(context).textTheme.bodyText1,
+                    // Options for selection
+                    // All specified values will override the [SegmentedTabControl] setting
+                    tabs: [
+                      SegmentTab(
+                        label: 'Pending \n Leaves',
+                        // For example, this overrides [indicatorColor] from [SegmentedTabControl]
+
+                      ),
+                      SegmentTab(
+                        label: 'Approved \n Leaves',
+
+                      ),
+                      const SegmentTab(label: 'Rejected \n Leaves'),
+                    ],
+                  ),
+                ),
+                // Sample pages
+                Padding(
+                  padding: const EdgeInsets.fromLTRB(0, 163, 0, 0),
+                  child: Container(
+                    height: 5,
+                    width: MediaQuery.of(context).size.width,
+                    color: Color(0x759e9e9e),
+                  ),
+                ),
+                Padding(
+                  padding: const EdgeInsets.only(top: 170),
+                  child: TabBarView(
+                    physics: const BouncingScrollPhysics(),
+                    children: [
+                      WidgetDataList(list: pendingList),
+                      WidgetDataList(list: approvedList),
+                      WidgetDataList(list: rejectedList),
+                      // SampleWidget(
+                      //   label: 'FIRST PAGE',
+                      //   color: Colors.red.shade200,
+                      // ),
+                      // SampleWidget(
+                      //   label: 'SECOND PAGE',
+                      //   color: Colors.blue.shade100,
+                      // ),
+                      // SampleWidget(
+                      //   label: 'THIRD PAGE',
+                      //   color: Colors.orange.shade200,
+                      // ),
+                    ],
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ),
+      ),
+    );
+
+  }
+
+  getLeavesResponse() async {
+
+    EasyLoading.show(status: 'loading...');
+    final prefs = await SharedPreferences.getInstance();
+    String token = prefs.getString(PrefrenceConst.acessToken)!;
+    try {
+      var url = Uri.parse(ApiConstants.baseUrl + ApiConstants.getLeaves);
+      var response = await http.get(url, headers: {
+        "Accept": 'application/json',
+        'Authorization': 'Bearer $token',
+        "Content-Type": "application/json"
+      });
+      if (response.statusCode == 200) {
+        EasyLoading.dismiss();
+
+        print("success");
+        setState(() {
+          leaves_response = getleavesResponceFromJson(response.body);
+          for(int i = 0; i< leaves_response.data!.length; i++){
+            if(leaves_response.data![i].eventStatus == "pending"){
+              pendingList.add(leaves_response.data![i]);
+            } else if(leaves_response.data![i].eventStatus == "approved"){
+              approvedList.add(leaves_response.data![i]);
+            } else if(leaves_response.data![i].eventStatus == "rejected"){
+              rejectedList.add(leaves_response.data![i]);
+            }
+          }
+
+        });
+      } else {
+        print("error");
+        EasyLoading.dismiss();
+        AlertDialogue().showAlertDialog(
+            context, "Alert Dialogue", response.body.toString());
+      }
+    } catch (e) {
+      print("e");
+      EasyLoading.dismiss();
+      String error = e.toString();
+      AlertDialogue().showAlertDialog(context, "Alert Dialogue", "$error");
+    }
+
+  }
+
+}
+
+class WidgetDataList extends StatefulWidget {
+  const WidgetDataList({Key? key,   required this.list}) : super(key: key);
+
+  final List<Data> list;
+  @override
+  _WidgetDataListState createState() => _WidgetDataListState();
+}
+
+class _WidgetDataListState extends State<WidgetDataList> {
+  @override
+  Widget build(BuildContext context) {
+    return Padding(
+      padding: const EdgeInsets.fromLTRB(0, 0, 0, 0),
+      child: Container(
+        decoration: BoxDecoration(
+
+          image: DecorationImage(
+              image: AssetImage('assets/img/bg.jpg'), fit: BoxFit.fill),
+        ),
+        child: ListView.builder(
+          scrollDirection: Axis.vertical,
+          itemCount: widget.list.length,
+          itemBuilder: (context, index) {
+            return Padding(
+              padding: const EdgeInsets.fromLTRB(0, 0, 0, 0),
+              child: GestureDetector(
+                onTap: () {
+                },
+                child: Container(
+
+                  width: MediaQuery.of(context).size.width,
+                  decoration: BoxDecoration(
+                    color: Colors.white.withOpacity(0.4),
+                  ),
+                  child: Wrap(
+                    children: [
+                      Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Padding(
+                            padding: const EdgeInsets.fromLTRB(20, 7, 20, 0),
+                            child: Row(
+                              mainAxisAlignment: MainAxisAlignment.start,
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Text(
+                                  "${widget.list[index].event}",
+                                  style: TextStyle(
+                                      fontFamily: "bold",
+                                      fontSize: 22,
+                                      color: Colors.black),
+                                ),
+
+                              ],
+                            ),
+                          ),
+                          SizedBox(
+                            height: 6,
+                          ),
+                          Padding(
+                            padding: const EdgeInsets.fromLTRB(20, 0, 20, 0),
+                            child: Row(
+                              children: [
+                                Container(
+                                    height: 15,
+                                    width: 15,
+                                    decoration: BoxDecoration(),
+                                    child: FittedBox(
+                                        child: Icon(
+                                          Icons.calendar_today_outlined,
+                                          color: Colors.grey,
+                                        ),
+                                        fit: BoxFit.fill)),
+                                SizedBox(
+                                  width: 5,
+                                ),
+                                Text(
+                                  "${DateFormat.yMMMMd().format(DateTime.parse(widget.list[index].plannedOn!))}",
+                                  style: TextStyle(
+                                      fontFamily: "semibold",
+                                      fontSize: 14,
+                                      color: Color(0xff909089)),
+                                ),
+
+
+                              ],
+                            ),
+                          ),
+                          Padding(
+                            padding:
+                            const EdgeInsets.fromLTRB(0, 10, 0, 7),
+                            child: Container(
+                              height: 0.5,
+                              width: MediaQuery.of(context).size.width,
+                              color: Color(0xffDCDCDC),
+                            ),
+                          ),
+
+                        ],
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+            );
+          },
+        ),
+      ),
+    );
+  }
+}

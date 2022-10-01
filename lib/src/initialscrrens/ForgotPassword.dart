@@ -353,7 +353,7 @@ class _ForgotPasswordState extends State<ForgotPassword> {
       var url = Uri.parse(ApiConstants.baseUrl + ApiConstants.forgetPassword);
       var response = await http.post(url, body: body);
       if (response.statusCode == 200) {
-
+        EasyLoading.dismiss();
         Responce  responce = responceFromJson(response.body);
         AlertDialogue().showAlertDialog(context, "Alert Dialogue", responce.message!);
         setState(() {
@@ -362,7 +362,7 @@ class _ForgotPasswordState extends State<ForgotPassword> {
         });
 
       } else {
-        EasyLoading.dismiss();
+
         AlertDialogue().showAlertDialog(context, "Alert Dialogue", response.body.toString());
       }
     } catch (e) {

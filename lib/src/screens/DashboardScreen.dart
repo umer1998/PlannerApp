@@ -1,17 +1,19 @@
 import 'dart:async';
 import 'dart:convert';
 import 'dart:io';
+
 import 'package:connectivity_plus/connectivity_plus.dart';
-import 'package:flutter_easyloading/flutter_easyloading.dart';
-import 'package:http/http.dart' as http;
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_easyloading/flutter_easyloading.dart';
+import 'package:http/http.dart' as http;
 import 'package:image_picker/image_picker.dart';
 import 'package:plannerapp/src/apis/ApiService%20.dart';
-import 'package:plannerapp/src/initialscrrens/Drawer.dart';
 import 'package:plannerapp/src/initialscrrens/HomeScreen.dart';
 import 'package:plannerapp/src/models/ChangedPlanRequest.dart';
 import 'package:plannerapp/src/models/Dashboard_Responce.dart';
+import 'package:plannerapp/src/screens/ExecutionList.dart';
+import 'package:plannerapp/src/screens/PlannedScreen.dart';
 import 'package:plannerapp/style/colors.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -179,11 +181,11 @@ class _DashboardScreenState extends State<DashboardScreen> {
                       children: [
                         GestureDetector(
                           onTap: () {
-                            Navigator.push(
-                              context,
-                              MaterialPageRoute(
-                                  builder: (context) => const HomeScreen()),
-                            );
+                            // Navigator.push(
+                            //   context,
+                            //   MaterialPageRoute(
+                            //       builder: (context) => const PlannedScreen()),
+                            // );
                           },
                           child: Container(
                             width: MediaQuery.of(context).size.width / 2 - 20,
@@ -264,11 +266,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
                         ),
                         GestureDetector(
                           onTap: () {
-                            Navigator.push(
-                              context,
-                              MaterialPageRoute(
-                                  builder: (context) => const HomeScreen()),
-                            );
+
                           },
                           child: Container(
                             width: MediaQuery.of(context).size.width / 2 - 20,
@@ -358,11 +356,11 @@ class _DashboardScreenState extends State<DashboardScreen> {
                       children: [
                         GestureDetector(
                           onTap: () {
-                            Navigator.push(
-                              context,
-                              MaterialPageRoute(
-                                  builder: (context) => const HomeScreen()),
-                            );
+                            // Navigator.push(
+                            //   context,
+                            //   MaterialPageRoute(
+                            //       builder: (context) => const ExecutionList()),
+                            // );
                           },
                           child: Container(
                             width: MediaQuery.of(context).size.width / 2 - 20,
@@ -443,11 +441,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
                         ),
                         GestureDetector(
                           onTap: () {
-                            Navigator.push(
-                              context,
-                              MaterialPageRoute(
-                                  builder: (context) => const HomeScreen()),
-                            );
+
                           },
                           child: Container(
                             width: MediaQuery.of(context).size.width / 2 - 20,

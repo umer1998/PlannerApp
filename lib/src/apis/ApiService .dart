@@ -7,6 +7,7 @@ import 'package:plannerapp/src/models/Configurations.dart';
 import 'package:plannerapp/src/models/CreateEvent_Responce.dart';
 import 'package:plannerapp/src/models/Dashboard_Responce.dart';
 import 'package:plannerapp/src/models/Login_Responce.dart';
+import 'package:plannerapp/src/screens/CreatePlan.dart';
 import 'package:plannerapp/utils/Prefrences.dart';
 import 'package:plannerapp/utils/alertdialogue.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -138,7 +139,7 @@ class ApiService {
         CreateEvent_Responce responce = createResponceFromJson(response.body);
         Navigator.pushReplacement(
           context,
-          MaterialPageRoute(builder: (context) => const HomeScreen()),
+          MaterialPageRoute(builder: (context) => const CreatePlan()),
         );
       } else {
         EasyLoading.dismiss();
@@ -227,6 +228,7 @@ class ApiService {
 
     }
   }
+
 
 
 

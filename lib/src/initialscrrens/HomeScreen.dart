@@ -4,7 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_easyloading/flutter_easyloading.dart';
 import 'package:persistent_bottom_nav_bar/persistent-tab-view.dart';
 import 'package:plannerapp/src/apis/ApiService%20.dart';
-import 'package:plannerapp/src/initialscrrens/Drawer.dart';
+import 'package:plannerapp/src/leaves/ScreenLeaves.dart';
 import 'package:plannerapp/src/screens/DashboardScreen.dart';
 import 'package:plannerapp/src/screens/PlannedScreen.dart';
 import 'package:plannerapp/style/colors.dart';
@@ -40,13 +40,11 @@ class _HomeScreenState extends State<HomeScreen> {
   late bool _hideNavBar;
   var testContext;
   int _selectedDestination = 0;
-  List<Data> pendingList= [];
-  List<Data> approvedList= [];
-  List<Data> rejectedList= [];
+
+
   @override
   void initState() {
     super.initState();
-    getLeavesResponse();
     getPrefrences();
     ApiService().getConfiguration(context);
     setState(() {
@@ -63,8 +61,7 @@ class _HomeScreenState extends State<HomeScreen> {
       return [
         DashboardScreen(),
         PlannedScreen(),
-        CreatePlan(
-        ),
+        CreatePlan(),
         ExecutionList(),
         Container(
           width: MediaQuery.of(context).size.width,
@@ -134,6 +131,7 @@ class _HomeScreenState extends State<HomeScreen> {
 
   }
 
+  String image = "";
 
 
   @override
@@ -184,18 +182,12 @@ class _HomeScreenState extends State<HomeScreen> {
                         SizedBox(
                           height: 15,
                         ),
-                        Container(
-                          height: 90,
-                          width: 90,
-                          decoration: BoxDecoration(
-                            image: DecorationImage(
-                                image: AssetImage("assets/img/person.png"),
-                                fit: BoxFit.fitHeight),
-                            shape: BoxShape.circle,
-                            border: Border.all(
-                              color: Colors.white,
-                              // color: Color(0xffFEFEFE),
-                              width: 3,
+                   Center(
+                          child: Padding(
+                            padding: const EdgeInsets.fromLTRB(8, 3, 8, 0),
+                            child: CircleAvatar(
+                              radius: 34,
+                              backgroundImage:  NetworkImage(image),
                             ),
                           ),
                         ),
@@ -242,6 +234,7 @@ class _HomeScreenState extends State<HomeScreen> {
                   fontSize: 18,
                   color: Color(0xff404042)
               ),),
+
               selected: _selectedDestination == 0,
               onTap: () => selectDestination(0),
             ),
@@ -253,6 +246,7 @@ class _HomeScreenState extends State<HomeScreen> {
                   color: Color(0xff404042)
 
               ),),
+
               selected: _selectedDestination == 1,
               onTap: () => selectDestination(1),
             ),
@@ -282,7 +276,7 @@ class _HomeScreenState extends State<HomeScreen> {
               height: 1,
               thickness: 1,
             ),
-            ListTile(),
+
 
             ListTile(
               leading: Icon(Icons.weekend , size: 20, color: Colors.grey,),
@@ -357,6 +351,7 @@ class _HomeScreenState extends State<HomeScreen> {
       SharedPreferences pref = await SharedPreferences.getInstance();
 
       setState(() {
+        image  = pref.getString(PrefrenceConst.image) == null ? "" : pref.getString(PrefrenceConst.image)!.replaceAll("\"", "")!;
 
         designation = pref.getString(PrefrenceConst.userDesignation)!;
         name = pref.getString(PrefrenceConst.userName)!;
@@ -369,9 +364,11 @@ class _HomeScreenState extends State<HomeScreen> {
       if(_selectedDestination == 4){
         Navigator.push(
           context,
-          MaterialPageRoute(builder: (context) =>  LeavesScreen(pendingList : pendingList, approvedList: approvedList, rejectedList: rejectedList)),
+          MaterialPageRoute(builder: (context) =>  ScreenLeaves())
+              // LeavesScreen(pendingList : pendingList, approvedList: approvedList, rejectedList: rejectedList)),
         );
-
+        _controller.jumpToTab(4);
+        _controller.index = 4;
       } else if(_selectedDestination == 5){
 
         SharedPreferences preferences = await SharedPreferences.getInstance();
@@ -384,15 +381,20 @@ class _HomeScreenState extends State<HomeScreen> {
 
         Navigator.of(context).pop();
         _controller.jumpToTab(0);
+        _controller.index = 0;
+
       }
       else if(_selectedDestination == 1){
 
         Navigator.of(context).pop();
         _controller.jumpToTab(1);
+        _controller.index = 1;
       }
       else if(_selectedDestination == 2){
         Navigator.of(context).pop();
-        _controller.jumpToTab(3);
+        _controller.jumpToTab(2);
+        _controller.index = 2;
+
       }
       else if(_selectedDestination == 3){
 
@@ -402,6 +404,8 @@ class _HomeScreenState extends State<HomeScreen> {
 
           Navigator.of(context).pop();
           _controller.jumpToTab(4);
+          _controller.index = 4;
+
         }
 
       }
@@ -409,47 +413,5 @@ class _HomeScreenState extends State<HomeScreen> {
   }
 
 
-  getLeavesResponse() async {
 
-    EasyLoading.show(status: 'loading...');
-    final prefs = await SharedPreferences.getInstance();
-    String token = prefs.getString(PrefrenceConst.acessToken)!;
-    try {
-      var url = Uri.parse(ApiConstants.baseUrl + ApiConstants.getLeaves);
-      var response = await http.get(url, headers: {
-        "Accept": 'application/json',
-        'Authorization': 'Bearer $token',
-        "Content-Type": "application/json"
-      });
-      if (response.statusCode == 200) {
-        EasyLoading.dismiss();
-
-        print("success");
-        setState(() {
-          leaves_response = getleavesResponceFromJson(response.body);
-          for(int i = 0; i< leaves_response.data!.length; i++){
-            if(leaves_response.data![i].eventStatus == "pending"){
-              pendingList.add(leaves_response.data![i]);
-            } else if(leaves_response.data![i].eventStatus == "approved"){
-              approvedList.add(leaves_response.data![i]);
-            } else if(leaves_response.data![i].eventStatus == "rejected"){
-              rejectedList.add(leaves_response.data![i]);
-            }
-          }
-
-        });
-      } else {
-        print("error");
-        EasyLoading.dismiss();
-        AlertDialogue().showAlertDialog(
-            context, "Alert Dialogue", response.body.toString());
-      }
-    } catch (e) {
-      print("e");
-      EasyLoading.dismiss();
-      String error = e.toString();
-      AlertDialogue().showAlertDialog(context, "Alert Dialogue", "$error");
-    }
-
-  }
 }

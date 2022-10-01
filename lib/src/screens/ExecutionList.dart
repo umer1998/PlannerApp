@@ -18,6 +18,7 @@ import '../../utils/ApiConstants.dart';
 import '../../utils/Prefrences.dart';
 import '../../utils/alertdialogue.dart';
 import '../models/Configurations.dart';
+import '../models/FeedBackSubmission.dart';
 import '../popups/CreateEventPopUp.dart';
 
 
@@ -33,7 +34,7 @@ class _ExecutionListState extends State<ExecutionList> {
   Execution_List_Responce? responce;
   late String  formatteddate;
   Timer? _timer;
-
+  late ConData _model;
 
   @override
   void initState() {
@@ -303,7 +304,7 @@ class OptionAlert extends StatefulWidget {
 class _AlertState extends State<OptionAlert> {
    String optionselected =  "Changed";
   options _value = options.Changed;
-
+   final Map radioMap = Map<String, String>();
    @override
    void initState() {
 
@@ -417,10 +418,15 @@ class _AlertState extends State<OptionAlert> {
                           onTap: (){
                             print(_value);
                             if(_value.name == "Planned"){
-                              Navigator.push(
-                                context,
-                                MaterialPageRoute(builder: (context) =>  FormScreen(eventPurpose: widget.eventPurpose, event: widget.event, event_id: widget.event_id,)),
-                              );
+                              if(setData(widget.eventPurpose, widget.event) == true){
+                                Navigator.push(
+                                  context,
+                                  MaterialPageRoute(builder: (context) =>  FormScreen(eventPurpose: widget.eventPurpose, event: widget.event, event_id: widget.event_id,)),
+                                );
+                              } else {
+                                saveData(radioMap);
+                              }
+
                             } else if(_value.name == "Changed"){
                               setState(() {
                                 Navigator.push(
@@ -466,6 +472,140 @@ class _AlertState extends State<OptionAlert> {
       ],
     );
   }
+
+   Future<bool> setData(String eventpurpose, String eventname) async {
+     final prefs = await SharedPreferences.getInstance();
+
+     String json = prefs!.getString(PrefrenceConst.events)!;
+     ConData _model = conDataFromJson(json);
+
+     List<Purposes> purp = _model.events![_model.events!.indexWhere(
+             (element) => element.eventNameLabel! == eventname)].purposes!;
+
+
+     if(purp[purp.indexWhere(
+             (element) => element.purposeName == eventpurpose)].feedbackQuestionnaire!.length > 0){
+       return true;
+     } else {
+       return false;
+     }
+
+
+
+     // for(int i= 0; i< _model.events!.length; i++){
+     //   if(_model.events![i].eventNameLabel == widget.event){
+     //     for(int j=0; j<_model.events![i].purposes!.length; i++ ){
+     //       if(_model.events![i].purposes![j].purposeName == eventpurpose){
+     //           return true;
+     //       }
+     //     }
+     //   }
+     // }
+     //  return false;
+   }
+
+
+   void saveData( Map radioMap) async {
+     final prefs = await SharedPreferences.getInstance();
+
+
+     FeedBackSubmission feedBackSubmission = FeedBackSubmission();
+     List<Feedbacks> feedList = [];
+     List<Questionaire> questionaireList = [];
+     Feedbacks feedbacks = Feedbacks();
+     feedbacks.plannerEventId = widget.event_id;
+     for(int i = 0 ; i< radioMap.length; i++){
+       Questionaire questionairee = new  Questionaire();
+       questionairee.questionId = int.parse(radioMap.keys.elementAt(i));
+       questionairee.result = radioMap.values.elementAt(i);
+       questionaireList.add(questionairee);
+
+     }
+     feedbacks.questionaire = questionaireList;
+     feedList.add(feedbacks);
+     feedBackSubmission.feedbacks = feedList;
+
+     var connectivityResult = await (Connectivity().checkConnectivity());
+     if (connectivityResult == ConnectivityResult.mobile) {
+       submittForm(context, feedBackSubmission.toJson());
+     } else if (connectivityResult == ConnectivityResult.wifi) {
+       submittForm(context, feedBackSubmission.toJson());
+     } else{
+
+       FeedBackSubmission submission = FeedBackSubmission();
+       if(prefs!.get(PrefrenceConst.feedback)! != ""){
+         submission = feedbackResponceFromJson(prefs.getString(PrefrenceConst.feedback)!);
+         List<Feedbacks> list = [];
+         list = submission.feedbacks!;
+         list.add(feedBackSubmission.feedbacks![0]);
+
+         submission.feedbacks = list;
+       } else {
+         List<Feedbacks> list = [];
+         list.add(feedBackSubmission.feedbacks![0]);
+         submission.feedbacks = list;
+       }
+       String jsonn = prefs.getString(PrefrenceConst.executionList)!;
+       Execution_List_Responce? responce = getExeListResponceFromJson(jsonn);
+       List<Data> liist = [];
+       for(int i =0 ; i< responce.data!.length; i++){
+         if(responce.data![i].plannerEventId.toString() == widget.event_id){
+
+         } else{
+           liist.add(responce.data![i]);
+         }
+       }
+       Execution_List_Responce changedResponce = new Execution_List_Responce();
+       changedResponce.data = liist;
+
+       //   final int index = responce.data!.indexWhere(
+       //           (element) => element.plannerEventId == widget.event_id);
+       // Data data1 = responce.data!.removeAt(index);
+       //   Execution_List_Responce? responce1 = new Execution_List_Responce();
+       //   responce1.data =data1;
+       //   print (responce.toString());
+       prefs.setString(PrefrenceConst.executionList, getExeListResponceInToJson(changedResponce));
+
+       prefs.setString(PrefrenceConst.feedback,feedbackInToJson(submission));
+       Navigator.pushReplacement(
+           context,
+           MaterialPageRoute(builder: (context) =>  HomeScreen() ));
+
+     }
+   }
+
+   submittForm(BuildContext context, Map body ) async {
+     EasyLoading.show(status: 'loading...');
+     final prefs = await SharedPreferences.getInstance();
+     String token = prefs.getString(PrefrenceConst.acessToken)!;
+
+     print (jsonEncode(body));
+     try {
+       var url = Uri.parse(ApiConstants.baseUrl + ApiConstants.postFeedback);
+       var response = await http.post(url, headers: {
+         "Accept": 'application/json',
+         "Content-Type": "application/json",
+         'Authorization': 'Bearer $token',
+       }, body: jsonEncode(body));
+       if (response.statusCode == 200) {
+         EasyLoading.dismiss();
+         setState(() {
+           Navigator.pushReplacement(
+               context,
+               MaterialPageRoute(builder: (context) => const HomeScreen()));
+           print("Successssss");
+         });
+       } else {
+         EasyLoading.dismiss();
+         AlertDialogue().showAlertDialog(
+             context, "Alert Dialogue", response.body.toString());
+       }
+     } catch (e) {
+       EasyLoading.dismiss();
+       String error = e.toString();
+       AlertDialogue().showAlertDialog(context, "Alert Dialogue", "$error");
+     }
+   }
 }
 
 

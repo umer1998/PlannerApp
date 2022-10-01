@@ -52,7 +52,7 @@ class _MyDialogueContentState extends State<CreateEventPopUp> {
   String regionvalue = "0";
 
   String areavalue = "0";
-  String branchvalue = "0";
+  String branchvalue = "-1";
 
   String meetingPlace = "0";
 
@@ -141,13 +141,13 @@ class _MyDialogueContentState extends State<CreateEventPopUp> {
                       DropdownButton<String>(
                           isExpanded: true,
                           // Initial Value
-                          hint: Text("Select Type"),
+                          hint: Text(widget.event ?? "Select Type"),
 
                           // Down Arrow Icon
                           icon: const Icon(Icons.keyboard_arrow_down),
                           // Array list of items
                           items: _eventTypes,
-                          value: eventTypevalue,
+                          // value: eventTypevalue,
                           // After selecting the desired option,it will
                           // change button value to selected value
                           onChanged: (String? newValue) async {
@@ -188,11 +188,11 @@ class _MyDialogueContentState extends State<CreateEventPopUp> {
                       DropdownButton<String>(
                         isExpanded: true,
                         // Initial Value
-                        hint: Text("Select Purpose"),
+                        hint: Text(widget.eventPurpose ?? "Select Purpose"),
 
                         // Down Arrow Icon
                         icon: const Icon(Icons.keyboard_arrow_down),
-                        value: eventPurposevalue,
+                        // value: eventPurposevalue,
                         // Array list of items
                         items: _eventPurpose,
                         // After selecting the desired option,it will
@@ -227,7 +227,7 @@ class _MyDialogueContentState extends State<CreateEventPopUp> {
 
                               // Down Arrow Icon
                               icon: const Icon(Icons.keyboard_arrow_down),
-                              value: branchvalue,
+                              // value: branchvalue,
                               // Array list of items
                               items: _meetingPlace,
                               // After selecting the desired option,it will
@@ -264,7 +264,7 @@ class _MyDialogueContentState extends State<CreateEventPopUp> {
                               icon: const Icon(Icons.keyboard_arrow_down),
 
                               hint: Text("Select Region"),
-                              value: regionvalue,
+                              // value: regionvalue,
                               // Array list of items
                               items: _region,
                               // After selecting the desired option,it will
@@ -300,7 +300,7 @@ class _MyDialogueContentState extends State<CreateEventPopUp> {
                                 // Down Arrow Icon
                                 icon: const Icon(Icons.keyboard_arrow_down),
                                 hint: Text("Select Area"),
-                                value: areavalue,
+                                // value: areavalue,
                                 // value: areavalue,
                                 // Array list of items
                                 items: _area,
@@ -322,6 +322,7 @@ class _MyDialogueContentState extends State<CreateEventPopUp> {
                                           value: areaslist[index]
                                               .branches![i]
                                               .code));
+                                      branchvalue = "0";
                                     }
 
                                     setState(() {
@@ -340,7 +341,7 @@ class _MyDialogueContentState extends State<CreateEventPopUp> {
                               isExpanded: true,
                               // Initial Value
                               hint: Text("Select Branch"),
-                              value: branchvalue,
+                              // value: branchvalue,
                               // value: branchvalue,
 
                               // Down Arrow Icon
@@ -423,10 +424,30 @@ class _MyDialogueContentState extends State<CreateEventPopUp> {
                                       changeList.add(changePlan);
                                       request.changedPlan = changeList;
                                     }
+                                    String jsonn = prefs.getString(PrefrenceConst.executionList)!;
+                                    Execution_List_Responce? responce = getExeListResponceFromJson(jsonn);
+                                    List<Data> liist = [];
+                                    for(int i =0 ; i< responce.data!.length; i++){
+                                      if(responce.data![i].plannerEventId.toString() == widget.plannerId){
+
+                                      } else{
+                                        liist.add(responce.data![i]);
+                                      }
+                                    }
+                                    Execution_List_Responce changedResponce = new Execution_List_Responce();
+                                    changedResponce.data = liist;
+
+                                    //   final int index = responce.data!.indexWhere(
+                                    //           (element) => element.plannerEventId == widget.event_id);
+                                    // Data data1 = responce.data!.removeAt(index);
+                                    //   Execution_List_Responce? responce1 = new Execution_List_Responce();
+                                    //   responce1.data =data1;
+                                    //   print (responce.toString());
+                                    prefs.setString(PrefrenceConst.executionList, getExeListResponceInToJson(changedResponce));
                                     prefs.setString(
                                         PrefrenceConst.replaceEventPlusFeedback,
                                         changeplanResponceInToJson(request));
-                                    Navigator.push(
+                                    Navigator.pushReplacement(
                                         context,
                                         MaterialPageRoute(
                                             builder: (context) => HomeScreen()));
@@ -491,10 +512,30 @@ class _MyDialogueContentState extends State<CreateEventPopUp> {
                                       changeList.add(changePlan);
                                       request.changedPlan = changeList;
                                     }
+                                    String jsonn = prefs.getString(PrefrenceConst.executionList)!;
+                                    Execution_List_Responce? responce = getExeListResponceFromJson(jsonn);
+                                    List<Data> liist = [];
+                                    for(int i =0 ; i< responce.data!.length; i++){
+                                      if(responce.data![i].plannerEventId.toString() == widget.plannerId){
+
+                                      } else{
+                                        liist.add(responce.data![i]);
+                                      }
+                                    }
+                                    Execution_List_Responce changedResponce = new Execution_List_Responce();
+                                    changedResponce.data = liist;
+
+                                    //   final int index = responce.data!.indexWhere(
+                                    //           (element) => element.plannerEventId == widget.event_id);
+                                    // Data data1 = responce.data!.removeAt(index);
+                                    //   Execution_List_Responce? responce1 = new Execution_List_Responce();
+                                    //   responce1.data =data1;
+                                    //   print (responce.toString());
+                                    prefs.setString(PrefrenceConst.executionList, getExeListResponceInToJson(changedResponce));
                                     prefs.setString(
                                         PrefrenceConst.replaceEventPlusFeedback,
                                         changeplanResponceInToJson(request));
-                                    Navigator.push(
+                                    Navigator.pushReplacement(
                                         context,
                                         MaterialPageRoute(
                                             builder: (context) => HomeScreen()));
@@ -502,6 +543,81 @@ class _MyDialogueContentState extends State<CreateEventPopUp> {
                                 } else {
                                   setData(newEvent, widget.plannerId);
                                 }
+                              }
+                            } else if(eventTypevalue.toString() == "leave" ||
+                                eventTypevalue.toString() == "Leave"){
+                              NewEvent newEvent = NewEvent();
+                              newEvent.plannedOn = DateFormat('yyyy-MM-dd').format(
+                                  DateTime.parse(_valueChanged1));
+                              newEvent.plan = widget.month;
+                              newEvent.eventId = eventTypevalue.toString();
+                              newEvent.purposeId = eventPurposevalue.toString();
+                              newEvent.purposeChildId = branchvalue.toString();
+                              ChangedPlanRequest changePlanRequest = ChangedPlanRequest();
+
+                              ChangedPlan changePlan = ChangedPlan();
+
+                              changePlan.newEvent = newEvent;
+                              changePlan.plannerEventId =
+                                  int.parse(widget.plannerId);
+                              List<Feedbackschange> list = [];
+                              changePlan.feedbacks = list;
+
+                              List<ChangedPlan> listt = [];
+                              listt.add(changePlan);
+
+                              changePlanRequest.changedPlan = listt;
+                              var connectivityResult = await (Connectivity()
+                                  .checkConnectivity());
+                              if (connectivityResult ==
+                                  ConnectivityResult.mobile ||
+                                  connectivityResult == ConnectivityResult.wifi) {
+                                submittForm(context, changePlanRequest.toJson());
+                              } else {
+                                ChangedPlanRequest request = ChangedPlanRequest();
+                                if (prefs!.get(
+                                    PrefrenceConst.replaceEventPlusFeedback)! !=
+                                    "") {
+                                  request =
+                                      changeplanResponceFromJson(prefs.getString(
+                                          PrefrenceConst
+                                              .replaceEventPlusFeedback)!);
+                                  List<ChangedPlan> changeList = [];
+                                  changeList = request.changedPlan!;
+                                  changeList.add(changePlan);
+                                  request.changedPlan = changeList;
+                                } else {
+                                  List<ChangedPlan> changeList = [];
+                                  changeList.add(changePlan);
+                                  request.changedPlan = changeList;
+                                }
+                                String jsonn = prefs.getString(PrefrenceConst.executionList)!;
+                                Execution_List_Responce? responce = getExeListResponceFromJson(jsonn);
+                                List<Data> liist = [];
+                                for(int i =0 ; i< responce.data!.length; i++){
+                                  if(responce.data![i].plannerEventId.toString() == widget.plannerId){
+
+                                  } else{
+                                    liist.add(responce.data![i]);
+                                  }
+                                }
+                                Execution_List_Responce changedResponce = new Execution_List_Responce();
+                                changedResponce.data = liist;
+
+                                //   final int index = responce.data!.indexWhere(
+                                //           (element) => element.plannerEventId == widget.event_id);
+                                // Data data1 = responce.data!.removeAt(index);
+                                //   Execution_List_Responce? responce1 = new Execution_List_Responce();
+                                //   responce1.data =data1;
+                                //   print (responce.toString());
+                                prefs.setString(PrefrenceConst.executionList, getExeListResponceInToJson(changedResponce));
+                                prefs.setString(
+                                    PrefrenceConst.replaceEventPlusFeedback,
+                                    changeplanResponceInToJson(request));
+                                Navigator.pushReplacement(
+                                    context,
+                                    MaterialPageRoute(
+                                        builder: (context) => HomeScreen()));
                               }
                             }
                             else {
@@ -562,7 +678,7 @@ class _MyDialogueContentState extends State<CreateEventPopUp> {
                                     prefs.setString(
                                         PrefrenceConst.replaceEventPlusFeedback,
                                         changeplanResponceInToJson(request));
-                                    Navigator.push(
+                                    Navigator.pushReplacement(
                                         context,
                                         MaterialPageRoute(
                                             builder: (context) => HomeScreen()));
@@ -728,8 +844,29 @@ class _MyDialogueContentState extends State<CreateEventPopUp> {
         list.add(changedPlanRequest.changedPlan![0]);
         request.changedPlan = list;
       }
+      String jsonn = prefs.getString(PrefrenceConst.executionList)!;
+      Execution_List_Responce? responce = getExeListResponceFromJson(jsonn);
+      List<Data> liist = [];
+      for(int i =0 ; i< responce.data!.length; i++){
+        if(responce.data![i].plannerEventId.toString() == widget.plannerId){
+
+        } else{
+          liist.add(responce.data![i]);
+        }
+      }
+      Execution_List_Responce changedResponce = new Execution_List_Responce();
+      changedResponce.data = liist;
+
+      //   final int index = responce.data!.indexWhere(
+      //           (element) => element.plannerEventId == widget.event_id);
+      // Data data1 = responce.data!.removeAt(index);
+      //   Execution_List_Responce? responce1 = new Execution_List_Responce();
+      //   responce1.data =data1;
+      //   print (responce.toString());
+      prefs.setString(PrefrenceConst.executionList, getExeListResponceInToJson(changedResponce));
+
       prefs.setString(PrefrenceConst.replaceEventPlusFeedback,changeplanResponceInToJson(request));
-      Navigator.push(
+      Navigator.pushReplacement(
           context,
           MaterialPageRoute(builder: (context) =>  HomeScreen() ));
 
@@ -753,7 +890,7 @@ class _MyDialogueContentState extends State<CreateEventPopUp> {
       }
     }
     if(questionnaire.length > 0){
-      Navigator.push(
+      Navigator.pushReplacement(
         context,
         MaterialPageRoute(builder: (context) =>  ChangedPlanFormScreen( event_id: widget.plannerId, newEvent: event, questionnaire: questionnaire, )),
       );

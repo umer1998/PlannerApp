@@ -14,31 +14,62 @@ class SplashScreen extends StatefulWidget {
   _SplashScreenState createState() => _SplashScreenState();
 }
 
-class _SplashScreenState extends State<SplashScreen> {
+class _SplashScreenState extends State<SplashScreen> with TickerProviderStateMixin{
   late final SharedPreferences prefs;
   bool isLogin = false;
+
+
+
+  late AnimationController _controller;
+  late Animation<double> _animation;
+
 
   @override
   void initState()  {
     getPrefrences();
     super.initState();
+
+    _controller = AnimationController(
+      duration: const Duration(seconds: 1),
+      vsync: this,
+    )..forward();
+    _animation = CurvedAnimation(parent: _controller, curve: Curves.easeIn)..addStatusListener((status) {
+      if(status == AnimationStatus.completed){
+        if(isLogin == true){
+          Navigator.pushReplacement(
+            context,
+            MaterialPageRoute(builder: (context) => const HomeScreen()),
+          );
+        } else {
+          Navigator.pushReplacement(
+            context,
+            MaterialPageRoute(builder: (context) => const LoginScreen()),
+          );
+        }
+
+      };
+    });
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: Container(
-        child: checkUserLogin()
+      body: Center(
+        child: Container(
+          child: FadeTransition(
+            opacity: _animation,
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Image.asset("assets/img/logo.png" , width: 130, height: 150,),
+              ],
+            ),
+          ),
+        ),
       ),
     );
   }
-  Widget checkUserLogin(){
-    if(isLogin == true){
-      return HomeScreen();
-    } else {
-      return LoginScreen();
-    }
-  }
+
 
   void getPrefrences() async {
     try{

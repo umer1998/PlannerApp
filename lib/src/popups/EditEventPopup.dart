@@ -35,14 +35,14 @@ class _EditEventState extends State<EditEvent> {
   List<DropdownMenuItem<String>> _meetingPlace = [];
 
   SharedPreferences? pref;
-  late String eventTypevalue = "0";
-  late String eventPurposevalue = "0";
-  String regionvalue = "0";
+  late String eventTypevalue = widget.list.event ?? "0";
+  late String eventPurposevalue = widget.list.eventPurpose ?? "0";
+  late String regionvalue = "0";
 
-  String areavalue = "0";
-  String branchvalue = "0";
+  late String areavalue ="0";
+  late String branchvalue = "0";
 
-  String meetingPlace = "0";
+  late String meetingPlace = "0";
 
   int typeid = 0;
   int purposeid = 0;
@@ -57,13 +57,14 @@ class _EditEventState extends State<EditEvent> {
 
   List<Areas> areaslist = [];
   String _valueChanged1 = DateFormat('yyyy-MM-dd').format(DateTime.now());
-  late TextEditingController _controller1 = TextEditingController(text: DateTime.now().toString());
+  late TextEditingController _controller1 ;
   List<MeetingPlaces> meetingPlaces = [];
 
 
   @override
   void initState() {
     getPrefrences();
+    _controller1 = TextEditingController(text: widget.list.plannedOn);
   }
 
 
@@ -118,7 +119,7 @@ class _EditEventState extends State<EditEvent> {
           DropdownButton<String>(
               isExpanded: true,
               // Initial Value
-              hint: Text("Select Type"),
+              hint: Text(widget.list.event ?? "Select type"),
 
               // Down Arrow Icon
               icon: const Icon(Icons.keyboard_arrow_down),
@@ -165,7 +166,7 @@ class _EditEventState extends State<EditEvent> {
           DropdownButton<String>(
             isExpanded: true,
             // Initial Value
-            hint: Text("Select Purpose"),
+            hint: Text(widget.list.eventPurpose ?? "Select Purpose"),
 
             // Down Arrow Icon
             icon: const Icon(Icons.keyboard_arrow_down),
@@ -299,6 +300,7 @@ class _EditEventState extends State<EditEvent> {
                               value: areaslist[index]
                                   .branches![i]
                                   .code));
+                          branchvalue = "0";
                         }
 
                         setState(() {

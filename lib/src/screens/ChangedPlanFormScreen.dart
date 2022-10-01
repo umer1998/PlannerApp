@@ -16,6 +16,7 @@ import 'package:http/http.dart' as http;
 
 import '../models/ChangedPlanRequest.dart';
 import '../models/Configurations.dart';
+import '../models/Execution_List_Responce.dart';
 import '../models/FeedBackSubmission.dart';
 
 
@@ -219,8 +220,29 @@ class _FormScreenState extends State<ChangedPlanFormScreen> {
         list.add(changedPlanRequest.changedPlan![0]);
         request.changedPlan = list;
       }
+
+      String jsonn = prefs.getString(PrefrenceConst.executionList)!;
+      Execution_List_Responce? responce = getExeListResponceFromJson(jsonn);
+      List<Data> liist = [];
+      for(int i =0 ; i< responce.data!.length; i++){
+        if(responce.data![i].plannerEventId.toString() == widget.event_id){
+
+        } else{
+          liist.add(responce.data![i]);
+        }
+      }
+      Execution_List_Responce changedResponce = new Execution_List_Responce();
+      changedResponce.data = liist;
+
+      //   final int index = responce.data!.indexWhere(
+      //           (element) => element.plannerEventId == widget.event_id);
+      // Data data1 = responce.data!.removeAt(index);
+      //   Execution_List_Responce? responce1 = new Execution_List_Responce();
+      //   responce1.data =data1;
+      //   print (responce.toString());
+      prefs.setString(PrefrenceConst.executionList, getExeListResponceInToJson(changedResponce));
       prefs.setString(PrefrenceConst.replaceEventPlusFeedback,changeplanResponceInToJson(request));
-      Navigator.push(
+      Navigator.pushReplacement(
           context,
           MaterialPageRoute(builder: (context) =>  HomeScreen() ));
 
