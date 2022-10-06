@@ -392,8 +392,8 @@ class _HomeScreenState extends State<HomeScreen> {
       }
       else if(_selectedDestination == 2){
         Navigator.of(context).pop();
-        _controller.jumpToTab(2);
-        _controller.index = 2;
+        _controller.jumpToTab(3);
+        _controller.index = 3;
 
       }
       else if(_selectedDestination == 3){

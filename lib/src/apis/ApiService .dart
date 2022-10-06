@@ -61,6 +61,7 @@ class ApiService {
   Future<CreateEvent_Responce?> createEvent(Map<String, String> body, BuildContext context) async {
     print("body");
     EasyLoading.show(status: 'loading...');
+    print(jsonEncode(body));
     final prefs = await SharedPreferences.getInstance();
     String token = prefs.getString(PrefrenceConst.acessToken)!;
     try {
@@ -127,6 +128,7 @@ class ApiService {
     EasyLoading.show(status: 'loading...');
     final prefs = await SharedPreferences.getInstance();
     String token = prefs.getString(PrefrenceConst.acessToken)!;
+    print(jsonEncode(body));
     try {
       var url = Uri.parse(ApiConstants.baseUrl + ApiConstants.actionStatusPlan);
       var response = await http.post(url, body: body, headers: {

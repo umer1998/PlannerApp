@@ -7,6 +7,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter_easyloading/flutter_easyloading.dart';
 import 'package:plannerapp/src/models/ApprovalRejectionFormat.dart';
+import 'package:plannerapp/src/screens/ApprovalList.dart';
 import 'package:plannerapp/style/colors.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:http/http.dart' as http;
@@ -238,8 +239,11 @@ class _ApproveRejectState extends State<ApproveReject> {
                                       format.plan = getPendingApproval!.data![index].plan;
                                       map[getPendingApproval!.data![index].id!.toString()] =  format;
                                     } else {
+
                                       listColor[index] = bgWhitewithOpacity;
                                       map.remove(getPendingApproval!.data![index].id.toString());
+
+
 
                                     }
                                   }
@@ -386,7 +390,12 @@ class _ApproveRejectState extends State<ApproveReject> {
                     children: [
                       InkWell(
                         onTap: (){
-                          showAlertDialog(context, 2);
+                          if(map.length == 0 ){
+                            EasyLoading.showToast("Please select atleast one record.");
+                          } else {
+                            showAlertDialog(context, 2);
+                          }
+
                         },
                         child: Container(
                           height: 45,
@@ -416,7 +425,12 @@ class _ApproveRejectState extends State<ApproveReject> {
                       ),
                       InkWell(
                         onTap: (){
-                          showAlertDialog(context, 1);
+                          if(map.length == 0){
+                            EasyLoading.showToast("Please select atleast one record.");
+                          } else {
+                            showAlertDialog(context, 1);
+                          }
+
                         },
                         child: Container(
                           height: 45,
@@ -661,7 +675,7 @@ class _ApproveRejectState extends State<ApproveReject> {
         setState(() {
           Navigator.pushReplacement(
               context,
-              MaterialPageRoute(builder: (context) => const HomeScreen()));
+              MaterialPageRoute(builder: (context) => const ApprovalList()));
           print("Successssss");
         });
       } else {

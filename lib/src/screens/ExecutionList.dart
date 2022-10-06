@@ -34,7 +34,6 @@ class _ExecutionListState extends State<ExecutionList> {
   Execution_List_Responce? responce;
   late String  formatteddate;
   Timer? _timer;
-  late ConData _model;
 
   @override
   void initState() {
@@ -304,10 +303,12 @@ class OptionAlert extends StatefulWidget {
 class _AlertState extends State<OptionAlert> {
    String optionselected =  "Changed";
   options _value = options.Changed;
+   late ConData _model;
+
    final Map radioMap = Map<String, String>();
    @override
    void initState() {
-
+     setPrefrences();
      super.initState();
    }
 
@@ -419,7 +420,7 @@ class _AlertState extends State<OptionAlert> {
                             print(_value);
                             if(_value.name == "Planned"){
                               if(setData(widget.eventPurpose, widget.event) == true){
-                                Navigator.push(
+                                Navigator.pushReplacement(
                                   context,
                                   MaterialPageRoute(builder: (context) =>  FormScreen(eventPurpose: widget.eventPurpose, event: widget.event, event_id: widget.event_id,)),
                                 );
@@ -429,7 +430,7 @@ class _AlertState extends State<OptionAlert> {
 
                             } else if(_value.name == "Changed"){
                               setState(() {
-                                Navigator.push(
+                                Navigator.pushReplacement(
                                     context,
                                     MaterialPageRoute(builder: (context) =>    CreateEventPopUp(month: widget.plan, plannerId: widget.event_id,eventPurpose: widget.eventPurpose, event: widget.event,)));
 
@@ -473,11 +474,8 @@ class _AlertState extends State<OptionAlert> {
     );
   }
 
-   Future<bool> setData(String eventpurpose, String eventname) async {
-     final prefs = await SharedPreferences.getInstance();
+   bool setData(String eventpurpose, String eventname)  {
 
-     String json = prefs!.getString(PrefrenceConst.events)!;
-     ConData _model = conDataFromJson(json);
 
      List<Purposes> purp = _model.events![_model.events!.indexWhere(
              (element) => element.eventNameLabel! == eventname)].purposes!;
@@ -606,6 +604,13 @@ class _AlertState extends State<OptionAlert> {
        AlertDialogue().showAlertDialog(context, "Alert Dialogue", "$error");
      }
    }
+
+  Future<void> setPrefrences() async {
+    final prefs = await SharedPreferences.getInstance();
+
+    String json = prefs!.getString(PrefrenceConst.events)!;
+    _model = conDataFromJson(json);
+  }
 }
 
 

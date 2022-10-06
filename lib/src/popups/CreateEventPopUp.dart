@@ -147,7 +147,7 @@ class _MyDialogueContentState extends State<CreateEventPopUp> {
                           icon: const Icon(Icons.keyboard_arrow_down),
                           // Array list of items
                           items: _eventTypes,
-                          // value: eventTypevalue,
+                          value: eventTypevalue,
                           // After selecting the desired option,it will
                           // change button value to selected value
                           onChanged: (String? newValue) async {
@@ -192,7 +192,7 @@ class _MyDialogueContentState extends State<CreateEventPopUp> {
 
                         // Down Arrow Icon
                         icon: const Icon(Icons.keyboard_arrow_down),
-                        // value: eventPurposevalue,
+                        value: eventPurposevalue,
                         // Array list of items
                         items: _eventPurpose,
                         // After selecting the desired option,it will
@@ -227,7 +227,7 @@ class _MyDialogueContentState extends State<CreateEventPopUp> {
 
                               // Down Arrow Icon
                               icon: const Icon(Icons.keyboard_arrow_down),
-                              // value: branchvalue,
+                              value: branchvalue,
                               // Array list of items
                               items: _meetingPlace,
                               // After selecting the desired option,it will
@@ -258,7 +258,7 @@ class _MyDialogueContentState extends State<CreateEventPopUp> {
                               isExpanded: true,
                               // Initial Value
 
-                              // value: regionvalue,
+                              value: regionvalue,
 
                               // Down Arrow Icon
                               icon: const Icon(Icons.keyboard_arrow_down),
@@ -301,7 +301,7 @@ class _MyDialogueContentState extends State<CreateEventPopUp> {
                                 icon: const Icon(Icons.keyboard_arrow_down),
                                 hint: Text("Select Area"),
                                 // value: areavalue,
-                                // value: areavalue,
+                                value: areavalue,
                                 // Array list of items
                                 items: _area,
                                 // After selecting the desired option,it will
@@ -342,7 +342,7 @@ class _MyDialogueContentState extends State<CreateEventPopUp> {
                               // Initial Value
                               hint: Text("Select Branch"),
                               // value: branchvalue,
-                              // value: branchvalue,
+                              value: branchvalue,
 
                               // Down Arrow Icon
                               icon: const Icon(Icons.keyboard_arrow_down),
